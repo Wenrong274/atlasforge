@@ -395,6 +395,9 @@ FodyWeavers.xsd
 # Local History for Visual Studio Code
 .history/
 
+# Local git worktrees
+.worktrees/
+
 # Windows Installer files from build outputs
 *.cab
 *.msi
