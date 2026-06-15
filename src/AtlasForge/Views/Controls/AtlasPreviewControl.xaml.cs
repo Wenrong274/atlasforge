@@ -1,11 +1,10 @@
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using AtlasForge.ViewModels;
 
 namespace AtlasForge.Views.Controls;
 
-public partial class AtlasPreviewControl : UserControl
+public partial class AtlasPreviewControl : System.Windows.Controls.UserControl
 {
     private double _zoom = 1.0;
 

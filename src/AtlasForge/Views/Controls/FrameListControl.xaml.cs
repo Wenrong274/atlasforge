@@ -1,31 +1,33 @@
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using AtlasForge.Services;
 using AtlasForge.ViewModels;
+using WpfDragEventArgs = System.Windows.DragEventArgs;
+using WpfMouseEventArgs = System.Windows.Input.MouseEventArgs;
+using WpfPoint = System.Windows.Point;
 
 namespace AtlasForge.Views.Controls;
 
-public partial class FrameListControl : UserControl
+public partial class FrameListControl : System.Windows.Controls.UserControl
 {
     private FrameItemViewModel? _dragItem;
-    private Point _dragStart;
+    private WpfPoint _dragStart;
 
     public FrameListControl() => InitializeComponent();
 
     private MainViewModel? VM => DataContext as MainViewModel;
 
-    private void DropZone_DragOver(object sender, DragEventArgs e)
+    private void DropZone_DragOver(object sender, WpfDragEventArgs e)
     {
-        e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop)
-            ? DragDropEffects.Copy
-            : DragDropEffects.None;
+        e.Effects = e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop)
+            ? System.Windows.DragDropEffects.Copy
+            : System.Windows.DragDropEffects.None;
         e.Handled = true;
     }
 
-    private async void DropZone_Drop(object sender, DragEventArgs e)
+    private async void DropZone_Drop(object sender, WpfDragEventArgs e)
     {
-        if (e.Data.GetData(DataFormats.FileDrop) is string[] files && VM is not null)
+        if (e.Data.GetData(System.Windows.DataFormats.FileDrop) is string[] files && VM is not null)
         {
             await VM.LoadFramesAsync(PngFiles(files));
         }
@@ -37,7 +39,7 @@ public partial class FrameListControl : UserControl
         _dragItem = (e.OriginalSource as FrameworkElement)?.DataContext as FrameItemViewModel;
     }
 
-    private void List_PreviewMouseMove(object sender, MouseEventArgs e)
+    private void List_PreviewMouseMove(object sender, WpfMouseEventArgs e)
     {
         if (e.LeftButton != MouseButtonState.Pressed || _dragItem is null)
         {
@@ -48,18 +50,18 @@ public partial class FrameListControl : UserControl
         if (Math.Abs(position.X - _dragStart.X) > SystemParameters.MinimumHorizontalDragDistance ||
             Math.Abs(position.Y - _dragStart.Y) > SystemParameters.MinimumVerticalDragDistance)
         {
-            DragDrop.DoDragDrop(FrameListBox, _dragItem, DragDropEffects.Move);
+            System.Windows.DragDrop.DoDragDrop(FrameListBox, _dragItem, System.Windows.DragDropEffects.Move);
         }
     }
 
-    private async void List_Drop(object sender, DragEventArgs e)
+    private async void List_Drop(object sender, WpfDragEventArgs e)
     {
         if (VM is null)
         {
             return;
         }
 
-        if (e.Data.GetData(DataFormats.FileDrop) is string[] files)
+        if (e.Data.GetData(System.Windows.DataFormats.FileDrop) is string[] files)
         {
             await VM.LoadFramesAsync(PngFiles(files));
             return;
