@@ -8,7 +8,12 @@ namespace AtlasForge.Views.Converters;
 public class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
-        value is true ? Visibility.Visible : Visibility.Collapsed;
+        value switch
+        {
+            bool boolValue => boolValue ? Visibility.Visible : Visibility.Collapsed,
+            int intValue => intValue > 0 ? Visibility.Visible : Visibility.Collapsed,
+            _ => Visibility.Collapsed
+        };
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         value is Visibility.Visible;
