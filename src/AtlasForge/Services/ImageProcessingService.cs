@@ -41,4 +41,57 @@ public class ImageProcessingService
             ? new SKRectI(0, 0, bitmap.Width, bitmap.Height)
             : new SKRectI(left, top, right + 1, bottom + 1);
     }
+
+    public List<FrameData> NormalizeFrames(List<FrameData> frames, bool alphaTrim, int padding)
+    {
+        if (frames.Count == 0)
+        {
+            return [];
+        }
+
+        var sourceRects = frames
+            .Select(frame => alphaTrim
+                ? frame.TrimRect
+                : new SKRectI(0, 0, frame.Bitmap.Width, frame.Bitmap.Height))
+            .ToList();
+
+        var maxWidth = sourceRects.Max(rect => rect.Width);
+        var maxHeight = sourceRects.Max(rect => rect.Height);
+        var cellWidth = maxWidth + padding * 2;
+        var cellHeight = maxHeight + padding * 2;
+
+        return frames
+            .Select((frame, index) =>
+            {
+                var sourceRect = sourceRects[index];
+                var drawX = padding + (maxWidth - sourceRect.Width) / 2;
+                var drawY = padding + (maxHeight - sourceRect.Height) / 2;
+
+                return CreateNormalized(frame, sourceRect, cellWidth, cellHeight, drawX, drawY);
+            })
+            .ToList();
+    }
+
+    private static FrameData CreateNormalized(
+        FrameData frame,
+        SKRectI sourceRect,
+        int cellWidth,
+        int cellHeight,
+        int drawX,
+        int drawY)
+    {
+        var normalized = new SKBitmap(cellWidth, cellHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using var canvas = new SKCanvas(normalized);
+        canvas.Clear(SKColors.Transparent);
+
+        var source = SKRect.Create(sourceRect.Left, sourceRect.Top, sourceRect.Width, sourceRect.Height);
+        var destination = SKRect.Create(drawX, drawY, sourceRect.Width, sourceRect.Height);
+        canvas.DrawBitmap(frame.Bitmap, source, destination);
+
+        return frame with
+        {
+            Bitmap = normalized,
+            TrimRect = new SKRectI(0, 0, cellWidth, cellHeight)
+        };
+    }
 }

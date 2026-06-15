@@ -1,3 +1,4 @@
+using AtlasForge.Models;
 using AtlasForge.Services;
 using SkiaSharp;
 
@@ -95,5 +96,50 @@ public class ImageProcessingServiceTests : IDisposable
         var rect = _svc.ComputeTrimRect(bitmap);
 
         Assert.Equal(new SKRectI(0, 0, 32, 32), rect);
+    }
+
+    [Fact]
+    public void NormalizeFrames_WithAlphaTrim_AllFramesSameSize()
+    {
+        var path1 = MakePng(64, 64, canvas =>
+            canvas.DrawRect(SKRect.Create(5, 5, 20, 20), new SKPaint { Color = SKColors.Red }));
+        var path2 = MakePng(64, 64, canvas =>
+            canvas.DrawRect(SKRect.Create(10, 10, 30, 30), new SKPaint { Color = SKColors.Blue }));
+        var frames = new List<FrameData>
+        {
+            _svc.LoadFrame(path1),
+            _svc.LoadFrame(path2)
+        };
+
+        var normalized = _svc.NormalizeFrames(frames, alphaTrim: true, padding: 0);
+
+        Assert.Equal(normalized[0].Bitmap.Width, normalized[1].Bitmap.Width);
+        Assert.Equal(normalized[0].Bitmap.Height, normalized[1].Bitmap.Height);
+    }
+
+    [Fact]
+    public void NormalizeFrames_WithPadding_SizeIncludesPadding()
+    {
+        var path = MakePng(32, 32, canvas =>
+            canvas.DrawRect(SKRect.Create(0, 0, 32, 32), new SKPaint { Color = SKColors.Red }));
+        var frames = new List<FrameData> { _svc.LoadFrame(path) };
+
+        var normalized = _svc.NormalizeFrames(frames, alphaTrim: false, padding: 4);
+
+        Assert.Equal(40, normalized[0].Bitmap.Width);
+        Assert.Equal(40, normalized[0].Bitmap.Height);
+    }
+
+    [Fact]
+    public void NormalizeFrames_NoAlphaTrim_UsesFullBitmapSize()
+    {
+        var path = MakePng(64, 64, canvas =>
+            canvas.DrawRect(SKRect.Create(10, 10, 10, 10), new SKPaint { Color = SKColors.Red }));
+        var frames = new List<FrameData> { _svc.LoadFrame(path) };
+
+        var normalized = _svc.NormalizeFrames(frames, alphaTrim: false, padding: 0);
+
+        Assert.Equal(64, normalized[0].Bitmap.Width);
+        Assert.Equal(64, normalized[0].Bitmap.Height);
     }
 }
