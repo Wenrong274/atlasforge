@@ -10,4 +10,3 @@ namespace AtlasForge;
 public partial class App : System.Windows.Application
 {
 }
-

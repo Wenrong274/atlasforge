@@ -1,7 +1,9 @@
 using System.Windows;
 using System.Windows.Input;
+
 using AtlasForge.Services;
 using AtlasForge.ViewModels;
+
 using WpfDragEventArgs = System.Windows.DragEventArgs;
 using WpfMouseEventArgs = System.Windows.Input.MouseEventArgs;
 using WpfPoint = System.Windows.Point;

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows.Data;
+
 using AtlasForge.Models;
 
 namespace AtlasForge.Views.Converters;

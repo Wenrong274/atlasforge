@@ -1,4 +1,5 @@
 using System.Windows;
+
 using AtlasForge.ViewModels;
 
 namespace AtlasForge.Views.Controls;
