@@ -36,20 +36,21 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="行"
-                                           Foreground="{StaticResource TextMuted}"
-                                           FontSize="9"
-                                           Margin="0,0,0,2" />
-                                <TextBox Text="{Binding GridRows, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource SettingsInputStyle}"
-                                         TextAlignment="Center" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="列"
+                                <TextBlock Text="列 (可調整)"
                                            Foreground="{StaticResource TextMuted}"
                                            FontSize="9"
                                            Margin="0,0,0,2" />
                                 <TextBox Text="{Binding GridColumns, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource SettingsInputStyle}"
+                                         TextAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="行 (自動計算)"
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontSize="9"
+                                           Margin="0,0,0,2" />
+                                <TextBox Text="{Binding GridRows}"
+                                         IsReadOnly="True"
                                          Style="{StaticResource SettingsInputStyle}"
                                          TextAlignment="Center" />
                             </StackPanel>
@@ -87,11 +88,7 @@
                                        FontSize="9"
                                        Margin="0,0,0,2" />
                             <ComboBox SelectedValue="{Binding MaxAtlasSize}"
-                                      SelectedValuePath="Tag"
-                                      Background="{StaticResource BgMid}"
-                                      Foreground="{StaticResource TextPrimary}"
-                                      BorderBrush="{StaticResource BgLight}"
-                                      FontSize="11">
+                                      SelectedValuePath="Tag">
                                 <ComboBoxItem Content="512 × 512" Tag="512" />
                                 <ComboBoxItem Content="1024 × 1024" Tag="1024" />
                                 <ComboBoxItem Content="2048 × 2048" Tag="2048" IsSelected="True" />
@@ -129,30 +126,6 @@
                                            FontSize="9" />
                             </StackPanel>
                         </CheckBox>
-                    </StackPanel>
-                </Border>
-
-                <Border BorderBrush="{StaticResource BorderColor}"
-                        BorderThickness="0,0,0,1"
-                        Padding="10,8">
-                    <StackPanel>
-                        <TextBlock Text="輸出路徑" Style="{StaticResource SectionLabelStyle}" />
-                        <Border Background="{StaticResource BgMid}"
-                                BorderBrush="{StaticResource BgLight}"
-                                BorderThickness="1"
-                                CornerRadius="3"
-                                Padding="6,4"
-                                Margin="0,0,0,4">
-                            <TextBlock Text="{Binding OutputPath}"
-                                       Foreground="{StaticResource TextMuted}"
-                                       FontSize="9"
-                                       TextTrimming="CharacterEllipsis"
-                                       ToolTip="{Binding OutputPath}" />
-                        </Border>
-                        <Button Content="📁 變更路徑"
-                                Style="{StaticResource ToolbarButtonStyle}"
-                                HorizontalAlignment="Stretch"
-                                Click="BrowsePath_Click" />
                     </StackPanel>
                 </Border>
 

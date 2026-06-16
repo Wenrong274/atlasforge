@@ -12,7 +12,7 @@ public class GridPackingService
     {
         if (frameCount <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(frameCount), "Frame count must be greater than zero.");
+            throw new ArgumentOutOfRangeException(nameof(frameCount), "幀數量必須大於零 (Frame count must be greater than zero).");
         }
 
         var columns = (int)Math.Ceiling(Math.Sqrt(frameCount));
@@ -25,7 +25,7 @@ public class GridPackingService
     {
         if (frames.Count == 0)
         {
-            throw new ArgumentException("No frames to pack.", nameof(frames));
+            throw new ArgumentException("沒有可封裝的幀 (No frames to pack).", nameof(frames));
         }
 
         var (columns, rows) = settings.AutoGrid
@@ -35,7 +35,7 @@ public class GridPackingService
         if (columns <= 0 || rows <= 0 || columns * rows < frames.Count)
         {
             throw new ArgumentException(
-                $"Grid {columns}x{rows} ({columns * rows} cells) cannot hold {frames.Count} frames. Increase columns/rows or enable Auto Grid.",
+                $"網格 {columns}x{rows}（{columns * rows} 格）裝不下 {frames.Count} 個幀 (Grid cannot hold all frames)。請調整行/列數，或開啟「自動計算行列」(enable Auto Grid)。",
                 nameof(settings));
         }
 

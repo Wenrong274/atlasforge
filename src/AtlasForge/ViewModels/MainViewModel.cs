@@ -77,16 +77,17 @@ public partial class MainViewModel : ObservableObject
 
     private bool _suppressGridPack;
 
+    private PackingMode _lastWorkingPackingMode = PackingMode.Grid;
+
     partial void OnPackingModeChanged(PackingMode value) => _ = PackAsync();
     partial void OnAutoGridChanged(bool value)
     {
         if (!value && Frames.Count > 0)
         {
-            var (columns, rows) = _gridPacker.AutoGrid(Frames.Count);
             _suppressGridPack = true;
-            GridColumns = columns;
+            GridColumns = _gridPacker.AutoGrid(Frames.Count).columns;
             _suppressGridPack = false;
-            GridRows = rows;
+            UpdateGridRowsFromColumns();
             return;
         }
 
@@ -94,12 +95,30 @@ public partial class MainViewModel : ObservableObject
     }
     partial void OnGridColumnsChanged(int value)
     {
-        if (!_suppressGridPack)
+        if (_suppressGridPack)
+        {
+            return;
+        }
+
+        if (AutoGrid)
         {
             _ = PackAsync();
+            return;
         }
+
+        UpdateGridRowsFromColumns();
     }
     partial void OnGridRowsChanged(int value) => _ = PackAsync();
+
+    private void UpdateGridRowsFromColumns()
+    {
+        if (GridColumns <= 0 || Frames.Count == 0)
+        {
+            return;
+        }
+
+        GridRows = Math.Max(1, (int)Math.Ceiling(Frames.Count / (double)GridColumns));
+    }
     partial void OnAlphaTrimChanged(bool value) => _ = PackAsync();
     partial void OnPaddingChanged(int value) => _ = PackAsync();
     partial void OnMaxAtlasSizeChanged(int value) => _ = PackAsync();
@@ -116,6 +135,12 @@ public partial class MainViewModel : ObservableObject
         }
 
         StatusMessage = $"✓ {Frames.Count} 幀已載入";
+
+        if (!AutoGrid)
+        {
+            UpdateGridRowsFromColumns();
+        }
+
         await PackAsync();
     }
 
@@ -142,6 +167,12 @@ public partial class MainViewModel : ObservableObject
         Frames.Remove(SelectedFrame);
         SelectedFrame = null;
         ReindexFrames();
+
+        if (!AutoGrid)
+        {
+            UpdateGridRowsFromColumns();
+        }
+
         _ = PackAsync();
     }
 
@@ -183,21 +214,45 @@ public partial class MainViewModel : ObservableObject
                     $" · {(result.isPowerOfTwo ? "✓PoT" : "⚠ 非PoT")}" +
                     (result.emptyCells > 0 ? $" · ⚠{result.emptyCells} 格空白" : "");
             });
+
+            _lastWorkingPackingMode = settings.PackingMode;
         }
         catch (Exception ex)
         {
-            RunOnUiThread(() => StatusMessage = $"⚠ {ex.Message}");
+            RunOnUiThread(() =>
+            {
+                StatusMessage = $"⚠ {ex.Message}";
+                System.Windows.MessageBox.Show(ex.Message, "切換失敗", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                if (settings.PackingMode != _lastWorkingPackingMode)
+                {
+                    PackingMode = _lastWorkingPackingMode;
+                }
+            });
         }
     }
 
     [RelayCommand]
     public void Export()
     {
-        if (CurrentAtlas is null || string.IsNullOrWhiteSpace(OutputPath))
+        if (CurrentAtlas is null)
         {
-            StatusMessage = "⚠ 請先設定輸出路徑";
+            StatusMessage = "⚠ 尚未產生可匯出的 Atlas";
             return;
         }
+
+        using var dialog = new System.Windows.Forms.FolderBrowserDialog
+        {
+            Description = "選擇輸出資料夾",
+            UseDescriptionForTitle = true
+        };
+
+        if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+        {
+            return;
+        }
+
+        OutputPath = dialog.SelectedPath;
 
         var baseName = Frames.Count > 0
             ? Path.GetFileNameWithoutExtension(Frames[0].FilePath)

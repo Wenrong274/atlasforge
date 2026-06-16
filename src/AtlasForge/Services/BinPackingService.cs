@@ -20,7 +20,7 @@ public class BinPackingService
     {
         if (frames.Count == 0)
         {
-            throw new ArgumentException("No frames to pack.", nameof(frames));
+            throw new ArgumentException("沒有可封裝的幀 (No frames to pack).", nameof(frames));
         }
 
         var maxSize = settings.MaxAtlasSize;
@@ -38,11 +38,11 @@ public class BinPackingService
                 if (width > maxSize || height > maxSize)
                 {
                     throw new InvalidOperationException(
-                        $"Frame {width}x{height} is larger than the {maxSize}x{maxSize} atlas: {frame.FilePath}. Increase Max Atlas Size.");
+                        $"幀尺寸 {width}x{height} 大於 Atlas 上限 {maxSize}x{maxSize} (Frame larger than atlas)：{frame.FilePath}。請調高「最大 Atlas 尺寸」(Increase Max Atlas Size)。");
                 }
 
                 throw new InvalidOperationException(
-                    $"Frames no longer fit in the {maxSize}x{maxSize} atlas (ran out of space): {frame.FilePath}. Increase Max Atlas Size or remove frames.");
+                    $"Atlas 空間不足 (Ran out of space in {maxSize}x{maxSize} atlas)：{frame.FilePath}。請調高「最大 Atlas 尺寸」或減少幀數 (Increase Max Atlas Size or remove frames)。");
             }
 
             var best = freeRects[bestIndex];
