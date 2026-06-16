@@ -1,6 +1,8 @@
-using AtlasForge.Models;
-using SkiaSharp;
 using System.IO;
+
+using AtlasForge.Models;
+
+using SkiaSharp;
 
 namespace AtlasForge.Services;
 
@@ -33,7 +35,14 @@ public class BinPackingService
 
             if (bestIndex < 0)
             {
-                throw new InvalidOperationException($"Frame does not fit in {maxSize}x{maxSize} atlas: {frame.FilePath}");
+                if (width > maxSize || height > maxSize)
+                {
+                    throw new InvalidOperationException(
+                        $"Frame {width}x{height} is larger than the {maxSize}x{maxSize} atlas: {frame.FilePath}. Increase Max Atlas Size.");
+                }
+
+                throw new InvalidOperationException(
+                    $"Frames no longer fit in the {maxSize}x{maxSize} atlas (ran out of space): {frame.FilePath}. Increase Max Atlas Size or remove frames.");
             }
 
             var best = freeRects[bestIndex];

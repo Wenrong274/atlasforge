@@ -1,6 +1,8 @@
-using AtlasForge.Models;
-using SkiaSharp;
 using System.IO;
+
+using AtlasForge.Models;
+
+using SkiaSharp;
 
 namespace AtlasForge.Services;
 
@@ -32,7 +34,9 @@ public class GridPackingService
 
         if (columns <= 0 || rows <= 0 || columns * rows < frames.Count)
         {
-            throw new ArgumentException("Grid dimensions cannot contain all frames.", nameof(settings));
+            throw new ArgumentException(
+                $"Grid {columns}x{rows} ({columns * rows} cells) cannot hold {frames.Count} frames. Increase columns/rows or enable Auto Grid.",
+                nameof(settings));
         }
 
         var frameWidth = frames[0].Bitmap.Width;

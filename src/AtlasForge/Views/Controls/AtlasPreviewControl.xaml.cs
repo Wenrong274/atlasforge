@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+
 using AtlasForge.ViewModels;
 
 namespace AtlasForge.Views.Controls;
@@ -14,14 +15,9 @@ public partial class AtlasPreviewControl : System.Windows.Controls.UserControl
 
     private void AtlasTab_Click(object sender, RoutedEventArgs e)
     {
-        VM?.StopAnimation();
+        VM?.ShowAtlasView();
         AtlasTabBtn.Style = (Style)FindResource("TabActiveStyle");
         AnimTabBtn.Style = (Style)FindResource("TabInactiveStyle");
-
-        if (VM?.CurrentAtlas is not null)
-        {
-            PreviewImage.Source = VM.AtlasPreview;
-        }
     }
 
     private void AnimTab_Click(object sender, RoutedEventArgs e)

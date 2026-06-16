@@ -3,8 +3,10 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+
 using AtlasForge.Models;
 using AtlasForge.Services;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -73,9 +75,30 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _outputPath = "";
 
+    private bool _suppressGridPack;
+
     partial void OnPackingModeChanged(PackingMode value) => _ = PackAsync();
-    partial void OnAutoGridChanged(bool value) => _ = PackAsync();
-    partial void OnGridColumnsChanged(int value) => _ = PackAsync();
+    partial void OnAutoGridChanged(bool value)
+    {
+        if (!value && Frames.Count > 0)
+        {
+            var (columns, rows) = _gridPacker.AutoGrid(Frames.Count);
+            _suppressGridPack = true;
+            GridColumns = columns;
+            _suppressGridPack = false;
+            GridRows = rows;
+            return;
+        }
+
+        _ = PackAsync();
+    }
+    partial void OnGridColumnsChanged(int value)
+    {
+        if (!_suppressGridPack)
+        {
+            _ = PackAsync();
+        }
+    }
     partial void OnGridRowsChanged(int value) => _ = PackAsync();
     partial void OnAlphaTrimChanged(bool value) => _ = PackAsync();
     partial void OnPaddingChanged(int value) => _ = PackAsync();
@@ -238,6 +261,16 @@ public partial class MainViewModel : ObservableObject
         }
 
         IsAnimationPlaying = false;
+    }
+
+    public void ShowAtlasView()
+    {
+        StopAnimation();
+
+        if (CurrentAtlas is not null)
+        {
+            AtlasPreview = _preview.RenderAtlas(CurrentAtlas);
+        }
     }
 
     private void OnAnimationTick(object? sender, EventArgs e)
