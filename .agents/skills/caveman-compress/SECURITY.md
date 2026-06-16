@@ -8,7 +8,7 @@
 
 1. **subprocess usage**: The skill calls the `claude` CLI via `subprocess.run()` as a fallback when `ANTHROPIC_API_KEY` is not set. The subprocess call uses a fixed argument list — no shell interpolation occurs. User file content is passed via stdin, not as a shell argument.
 
-2. **File read/write**: The skill reads the file the user explicitly points it at, compresses it, and writes the result back to the same path. A backup is written outside the source directory under `<platform-data>/caveman-compress/backups/<source-parent>/<stem>.original.md`, where `<platform-data>` is the platform data directory returned by `backup_dir_for()` (`%LOCALAPPDATA%` on Windows, `$XDG_DATA_HOME` or `~/.local/share` elsewhere). This avoids skill auto-loaders re-ingesting backup copies as live files.
+2. **File read/write**: The skill reads the file the user explicitly points it at, compresses it, and writes the result back to the same path. A `.original.md` backup is written outside the source directory under the directory returned by `backup_dir_for()`: `%LOCALAPPDATA%\caveman-compress\backups\<source-parent>` on Windows, or `~/AppData/Local\caveman-compress\backups\<source-parent>` if `%LOCALAPPDATA%` is unset; `$XDG_DATA_HOME/caveman-compress/backups/<source-parent>` or `~/.local/share/caveman-compress/backups/<source-parent>` elsewhere. The backup filename is `<stem>.original.md`, so the full backup shape is `<platform-data>/caveman-compress/backups/<source-parent>/<stem>.original.md`. This avoids skill auto-loaders re-ingesting backup copies as live files.
 
 ### What the skill does NOT do
 
