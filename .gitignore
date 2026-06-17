@@ -486,3 +486,4 @@ $RECYCLE.BIN/
 
 # Generated Superpowers runtime state
 .superpowers/brainstorm/
+.agents/skills/

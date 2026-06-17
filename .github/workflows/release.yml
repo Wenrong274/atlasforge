@@ -1,0 +1,55 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - run: dotnet restore AtlasForge.sln
+
+      - run: dotnet format AtlasForge.sln --verify-no-changes
+
+      - run: dotnet build AtlasForge.sln --no-restore -c Release
+
+      - run: dotnet test AtlasForge.sln --no-build -c Release
+
+      - name: Publish Windows x64
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $publishDir = Join-Path $env:RUNNER_TEMP "AtlasForge-$tag-win-x64"
+          dotnet publish src\AtlasForge\AtlasForge.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o $publishDir
+          "PUBLISH_DIR=$publishDir" >> $env:GITHUB_ENV
+          "ASSET_NAME=AtlasForge-$tag-win-x64.zip" >> $env:GITHUB_ENV
+
+      - name: Zip release asset
+        shell: pwsh
+        run: Compress-Archive -Path "$env:PUBLISH_DIR\*" -DestinationPath "$env:ASSET_NAME" -Force
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create "${{ github.ref_name }}" "$env:ASSET_NAME" `
+            --title "AtlasForge ${{ github.ref_name }}" `
+            --generate-notes
