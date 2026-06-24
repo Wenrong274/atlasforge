@@ -300,7 +300,7 @@ public partial class MainViewModel : ObservableObject
         if (string.IsNullOrEmpty(UpdateUrl))
             return;
 
-        System.Diagnostics.Process.Start(
+        using var process = System.Diagnostics.Process.Start(
             new System.Diagnostics.ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
     }
 
@@ -311,16 +311,23 @@ public partial class MainViewModel : ObservableObject
 
     private async Task CheckForUpdatesAsync()
     {
-        var info = await new UpdateChecker().CheckAsync();
-        if (info is null)
-            return;
-
-        RunOnUiThread(() =>
+        try
         {
-            LatestVersion = info.LatestVersion;
-            UpdateUrl = info.DownloadUrl;
-            HasUpdate = true;
-        });
+            var info = await new UpdateChecker().CheckAsync();
+            if (info is null)
+                return;
+
+            RunOnUiThread(() =>
+            {
+                LatestVersion = info.LatestVersion;
+                UpdateUrl = info.DownloadUrl;
+                HasUpdate = true;
+            });
+        }
+        catch
+        {
+            // silent fail — update check must never crash the app
+        }
     }
 
     public void StepFrame(int delta)
