@@ -24,12 +24,13 @@ public class UpdateChecker
 
     public async Task<UpdateInfo?> CheckAsync()
     {
+        var cached = TryLoadCache();
+
+        if (cached != null && DateTime.UtcNow - cached.CheckedAt < TimeSpan.FromHours(24))
+            return IsNewer(cached.LatestVersion) ? new UpdateInfo(cached.LatestVersion, cached.DownloadUrl) : null;
+
         try
         {
-            var cached = TryLoadCache();
-            if (cached != null && DateTime.UtcNow - cached.CheckedAt < TimeSpan.FromHours(24))
-                return IsNewer(cached.LatestVersion) ? new UpdateInfo(cached.LatestVersion, cached.DownloadUrl) : null;
-
             var release = await FetchLatestAsync();
             if (release == null)
                 return null;
@@ -39,7 +40,10 @@ public class UpdateChecker
         }
         catch
         {
-            return null;
+            // Network failed — fall back to stale cache if available
+            return cached != null && IsNewer(cached.LatestVersion)
+                ? new UpdateInfo(cached.LatestVersion, cached.DownloadUrl)
+                : null;
         }
     }
 
