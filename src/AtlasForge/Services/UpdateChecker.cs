@@ -72,7 +72,7 @@ public class UpdateChecker
 
     private static async Task<ReleaseResponse?> FetchLatestAsync()
     {
-        var resp = await _http.GetAsync(ApiUrl);
+        using var resp = await _http.GetAsync(ApiUrl);
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<ReleaseResponse>();
     }
