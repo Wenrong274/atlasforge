@@ -75,9 +75,22 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _outputPath = "";
 
+    [ObservableProperty]
+    private bool _hasUpdate;
+
+    [ObservableProperty]
+    private string _latestVersion = string.Empty;
+
+    [ObservableProperty]
+    private string _updateUrl = string.Empty;
+
     private bool _suppressGridPack;
 
     private PackingMode _lastWorkingPackingMode = PackingMode.Grid;
+
+    public string UpdateBadgeText => $"↑ {LatestVersion} 可用";
+
+    partial void OnLatestVersionChanged(string value) => OnPropertyChanged(nameof(UpdateBadgeText));
 
     partial void OnPackingModeChanged(PackingMode value) => _ = PackAsync();
     partial void OnAutoGridChanged(bool value)
@@ -279,6 +292,35 @@ public partial class MainViewModel : ObservableObject
         {
             StartAnimation();
         }
+    }
+
+    [RelayCommand]
+    private void OpenUpdate()
+    {
+        if (string.IsNullOrEmpty(UpdateUrl))
+            return;
+
+        System.Diagnostics.Process.Start(
+            new System.Diagnostics.ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
+    }
+
+    public MainViewModel()
+    {
+        _ = CheckForUpdatesAsync();
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        var info = await new UpdateChecker().CheckAsync();
+        if (info is null)
+            return;
+
+        RunOnUiThread(() =>
+        {
+            LatestVersion = info.LatestVersion;
+            UpdateUrl = info.DownloadUrl;
+            HasUpdate = true;
+        });
     }
 
     public void StepFrame(int delta)
