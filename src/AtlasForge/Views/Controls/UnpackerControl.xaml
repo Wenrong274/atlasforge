@@ -52,38 +52,38 @@
             <StackPanel Grid.Row="0">
                 <TextBlock Text="🔧 拆圖參數設定" Style="{StaticResource SectionLabelStyle}" Foreground="{StaticResource PurpleAccent}" />
                 
-                <TextBlock Text="合圖路徑 (.png)" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,2" FontSize="10" />
+                <TextBlock Text="合圖路徑 (.png)" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,2" FontSize="12" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="ImagePathTxt" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" AllowDrop="True" PreviewDragOver="Txt_DragOver" Drop="Image_Drop" />
+                    <TextBox x:Name="ImagePathTxt" Height="26" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="5,3" AllowDrop="True" PreviewDragOver="Txt_DragOver" Drop="Image_Drop" />
                     <Button Grid.Column="1" Content="📄" Style="{StaticResource ToolbarButtonStyle}" Margin="4,0,0,0" Click="BrowseImage_Click" />
                 </Grid>
 
-                <TextBlock Text="切分模式" Foreground="{StaticResource TextSecondary}" Margin="0,10,0,2" FontSize="10" />
+                <TextBlock Text="切分模式" Foreground="{StaticResource TextSecondary}" Margin="0,10,0,2" FontSize="12" />
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,8">
-                    <RadioButton x:Name="ModeDescRadio" Content="描述檔 (JSON/Plist)" Foreground="{StaticResource TextPrimary}" IsChecked="True" Checked="Mode_Checked" Margin="0,0,10,0" />
-                    <RadioButton x:Name="ModeGridRadio" Content="網格 (Grid)" Foreground="{StaticResource TextPrimary}" Checked="Mode_Checked" />
+                    <RadioButton x:Name="ModeDescRadio" Content="描述檔 (JSON/Plist)" Foreground="{StaticResource TextPrimary}" IsChecked="True" Checked="Mode_Checked" Margin="0,0,10,0" FontSize="12" />
+                    <RadioButton x:Name="ModeGridRadio" Content="網格 (Grid)" Foreground="{StaticResource TextPrimary}" Checked="Mode_Checked" FontSize="12" />
                 </StackPanel>
 
                 <!-- 描述檔輸入區 -->
                 <StackPanel x:Name="DescPanel">
-                    <TextBlock Text="描述檔路徑" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,2" FontSize="10" />
+                    <TextBlock Text="描述檔路徑" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,2" FontSize="12" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="DescPathTxt" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" AllowDrop="True" PreviewDragOver="Txt_DragOver" Drop="Desc_Drop" />
+                        <TextBox x:Name="DescPathTxt" Height="26" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="5,3" AllowDrop="True" PreviewDragOver="Txt_DragOver" Drop="Desc_Drop" />
                         <Button Grid.Column="1" Content="📄" Style="{StaticResource ToolbarButtonStyle}" Margin="4,0,0,0" Click="BrowseDesc_Click" />
                     </Grid>
                 </StackPanel>
 
                 <!-- 網格輸入區 (預設隱藏) -->
                 <StackPanel x:Name="GridPanel" Visibility="Collapsed">
-                    <TextBlock Text="網格切分設定" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,2" FontSize="10" />
+                    <TextBlock Text="網格切分設定" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,2" FontSize="12" />
                     <Grid Margin="0,2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -93,37 +93,37 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="行數 (Cols)" Foreground="{StaticResource TextMuted}" FontSize="9" />
-                            <TextBox x:Name="GridColsTxt" Text="4" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" TextChanged="GridSettings_TextChanged" />
+                            <TextBlock Text="行數 (Cols)" Foreground="{StaticResource TextMuted}" FontSize="11" />
+                            <TextBox x:Name="GridColsTxt" Text="4" Height="26" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="5,3" TextChanged="GridSettings_TextChanged" />
                         </StackPanel>
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="列數 (Rows)" Foreground="{StaticResource TextMuted}" FontSize="9" />
-                            <TextBox x:Name="GridRowsTxt" Text="4" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" TextChanged="GridSettings_TextChanged" />
+                            <TextBlock Text="列數 (Rows)" Foreground="{StaticResource TextMuted}" FontSize="11" />
+                            <TextBox x:Name="GridRowsTxt" Text="4" Height="26" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="5,3" TextChanged="GridSettings_TextChanged" />
                         </StackPanel>
                         <StackPanel Grid.Column="4">
-                            <TextBlock Text="間距 (Padding)" Foreground="{StaticResource TextMuted}" FontSize="9" />
-                            <TextBox x:Name="GridPaddingTxt" Text="0" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" TextChanged="GridSettings_TextChanged" />
+                            <TextBlock Text="間距 (Padding)" Foreground="{StaticResource TextMuted}" FontSize="11" />
+                            <TextBox x:Name="GridPaddingTxt" Text="0" Height="26" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="5,3" TextChanged="GridSettings_TextChanged" />
                         </StackPanel>
                     </Grid>
-                    <Button Content="🪄 自動偵測網格" Style="{StaticResource PurpleButtonStyle}" Height="22" Margin="0,6,0,0" Click="AutoDetectGrid_Click" />
+                    <Button Content="🪄 自動偵測網格" Style="{StaticResource PurpleButtonStyle}" Height="26" Margin="0,6,0,0" Click="AutoDetectGrid_Click" />
                 </StackPanel>
 
-                <TextBlock Text="輸出資料夾" Foreground="{StaticResource TextSecondary}" Margin="0,10,0,2" FontSize="10" />
+                <TextBlock Text="輸出資料夾" Foreground="{StaticResource TextSecondary}" Margin="0,10,0,2" FontSize="12" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="OutputDirTxt" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" />
+                    <TextBox x:Name="OutputDirTxt" Height="26" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="5,3" />
                     <Button Grid.Column="1" Content="📁" Style="{StaticResource ToolbarButtonStyle}" Margin="4,0,0,0" Click="BrowseOutput_Click" />
                 </Grid>
             </StackPanel>
 
             <StackPanel Grid.Row="1" Margin="0,10,0,0">
-                <TextBlock x:Name="StatusLbl" Text="等待預覽分析..." Foreground="{StaticResource TextMuted}" FontSize="10" Margin="0,0,0,5" />
+                <TextBlock x:Name="StatusLbl" Text="等待預覽分析..." Foreground="{StaticResource TextMuted}" FontSize="12" Margin="0,0,0,5" />
                 <ProgressBar x:Name="UnpackProgress" Height="8" Background="{StaticResource BgMid}" Foreground="{StaticResource PurpleAccent}" BorderThickness="0" Margin="0,0,0,8" Visibility="Collapsed" />
-                <Button Content="🔍 預覽分析" Style="{StaticResource PurpleButtonStyle}" Height="28" Margin="0,0,0,6" Click="Preview_Click" />
-                <Button Content="🚀 開始拆分" Style="{StaticResource PurpleButtonStyle}" Height="28" Click="Unpack_Click" />
+                <Button Content="🔍 預覽分析" Style="{StaticResource PurpleButtonStyle}" Height="32" Margin="0,0,0,6" Click="Preview_Click" />
+                <Button Content="🚀 開始拆分" Style="{StaticResource PurpleButtonStyle}" Height="32" Click="Unpack_Click" />
             </StackPanel>
         </Grid>
 
@@ -169,8 +169,8 @@
                                 <Image Source="{Binding Thumbnail}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="10" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Foreground="{StaticResource TextMuted}" FontSize="9">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Foreground="{StaticResource TextMuted}" FontSize="11">
                                     <Run Text="{Binding Width, Mode=OneWay}" /><Run Text="x" /><Run Text="{Binding Height, Mode=OneWay}" />
                                 </TextBlock>
                             </StackPanel>
@@ -191,25 +191,53 @@
 
             <TextBlock Grid.Row="0" Text="🖼 合圖預覽 (點選左欄項目以高亮顯示)" Style="{StaticResource SectionLabelStyle}" Margin="0,0,0,5" />
             
-            <ScrollViewer Grid.Row="1" x:Name="PreviewScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <Grid>
-                    <Grid.Background>
-                        <DrawingBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
-                            <DrawingBrush.Drawing>
-                                <DrawingGroup>
-                                    <GeometryDrawing Brush="#1A1A2E" Geometry="M0,0 H16 V16 H0Z" />
-                                    <GeometryDrawing Brush="#12121E" Geometry="M0,0 H8 V8 H0Z M8,8 H16 V16 H8Z" />
-                                </DrawingGroup>
-                            </DrawingBrush.Drawing>
-                        </DrawingBrush>
-                    </Grid.Background>
+            <Grid Grid.Row="1">
+                <ScrollViewer x:Name="PreviewScroll"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              MouseEnter="PreviewScroll_MouseEnter"
+                              MouseLeave="PreviewScroll_MouseLeave"
+                              PreviewMouseLeftButtonDown="PreviewScroll_MouseLeftButtonDown"
+                              MouseMove="PreviewScroll_MouseMove"
+                              PreviewMouseLeftButtonUp="PreviewScroll_MouseLeftButtonUp">
+                    <Grid>
+                        <Grid.Background>
+                            <DrawingBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
+                                <DrawingBrush.Drawing>
+                                    <DrawingGroup>
+                                        <GeometryDrawing Brush="#1A1A2E" Geometry="M0,0 H16 V16 H0Z" />
+                                        <GeometryDrawing Brush="#12121E" Geometry="M0,0 H8 V8 H0Z M8,8 H16 V16 H8Z" />
+                                    </DrawingGroup>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Grid.Background>
 
-                    <Grid x:Name="ImageContainer" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16">
-                        <Image x:Name="PreviewImage" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
-                        <Canvas x:Name="HighlightCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" />
+                        <Grid x:Name="ImageContainer" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16">
+                            <Image x:Name="PreviewImage" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                            <Canvas x:Name="HighlightCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" />
+                        </Grid>
                     </Grid>
-                </Grid>
-            </ScrollViewer>
+                </ScrollViewer>
+
+                <!-- 操作提示浮層 -->
+                <Border x:Name="HintsOverlay"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Left"
+                        Margin="12"
+                        Background="#CC1E293B"
+                        CornerRadius="6"
+                        Padding="8,5"
+                        IsHitTestVisible="False">
+                    <StackPanel>
+                        <TextBlock FontSize="12" Foreground="#64748B">
+                            <Run Text="Ctrl + 滾輪" FontFamily="Consolas" /><Run Text="　縮放" />
+                        </TextBlock>
+                        <TextBlock FontSize="12" Foreground="#64748B" Margin="0,2,0,0">
+                            <Run Text="拖曳" /><Run Text="　　　　移動" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

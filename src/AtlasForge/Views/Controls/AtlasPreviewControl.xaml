@@ -38,7 +38,7 @@
                     <TextBlock x:Name="ZoomLabel"
                                Text="100%"
                                Foreground="{StaticResource TextMuted}"
-                               FontSize="10"
+                               FontSize="12"
                                Margin="4,0"
                                VerticalAlignment="Center" />
                     <Button Content="＋"
@@ -98,10 +98,10 @@
                     Padding="8,5"
                     IsHitTestVisible="False">
                 <StackPanel>
-                    <TextBlock FontSize="10" Foreground="#64748B">
+                    <TextBlock FontSize="12" Foreground="#64748B">
                         <Run Text="Ctrl + 滾輪" FontFamily="Consolas" /><Run Text="　縮放" />
                     </TextBlock>
-                    <TextBlock FontSize="10" Foreground="#64748B" Margin="0,2,0,0">
+                    <TextBlock FontSize="12" Foreground="#64748B" Margin="0,2,0,0">
                         <Run Text="拖曳" /><Run Text="　　　　移動" />
                     </TextBlock>
                 </StackPanel>
@@ -115,7 +115,7 @@
                 Padding="10,4">
             <TextBlock Text="{Binding StatusMessage}"
                        Foreground="{StaticResource TextMuted}"
-                       FontSize="10" />
+                       FontSize="12" />
         </Border>
     </Grid>
 </UserControl>

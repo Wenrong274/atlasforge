@@ -22,8 +22,8 @@
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
         <Setter Property="BorderBrush" Value="{StaticResource BgLight}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="8,3" />
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -49,8 +49,8 @@
         <Setter Property="Background" Value="{DynamicResource Accent}" />
         <Setter Property="Foreground" Value="#E0F2FE" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="12,3" />
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="14,4" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
@@ -70,8 +70,8 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="12,3" />
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="14,4" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -92,7 +92,7 @@
     </Style>
 
     <Style x:Key="SectionLabelStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
         <Setter Property="Margin" Value="0,0,0,6" />
@@ -102,9 +102,9 @@
         <Setter Property="Background" Value="{DynamicResource Accent}" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Padding" Value="0,9" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,11" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -129,13 +129,13 @@
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
         <Setter Property="BorderBrush" Value="{StaticResource BgLight}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="6,3" />
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontSize" Value="13" />
     </Style>
 
     <Style TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
-        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
@@ -159,8 +159,8 @@
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
         <Setter Property="BorderBrush" Value="{StaticResource BgLight}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="6,3" />
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -227,8 +227,8 @@
         <Setter Property="Background" Value="#F59E0B" />
         <Setter Property="Foreground" Value="#1C1917" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="8,3" />
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">

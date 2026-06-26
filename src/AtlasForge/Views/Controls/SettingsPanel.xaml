@@ -17,12 +17,12 @@
                                              Margin="0,0,8,0"
                                              IsChecked="{Binding PackingMode, Converter={StaticResource IsGridMode}}"
                                              Foreground="{StaticResource TextSecondary}"
-                                             FontSize="10" />
+                                             FontSize="12" />
                                 <RadioButton Content="BinPack"
                                              GroupName="PackMode"
                                              IsChecked="{Binding PackingMode, Converter={StaticResource IsBinPackMode}}"
                                              Foreground="{StaticResource TextSecondary}"
-                                             FontSize="10" />
+                                             FontSize="12" />
                             </StackPanel>
                         </Border>
                         <CheckBox Content="自動計算行列"
@@ -38,7 +38,7 @@
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="列 (可調整)"
                                            Foreground="{StaticResource TextMuted}"
-                                           FontSize="9"
+                                           FontSize="11"
                                            Margin="0,0,0,2" />
                                 <TextBox Text="{Binding GridColumns, UpdateSourceTrigger=PropertyChanged}"
                                          Style="{StaticResource SettingsInputStyle}"
@@ -47,7 +47,7 @@
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="行 (自動計算)"
                                            Foreground="{StaticResource TextMuted}"
-                                           FontSize="9"
+                                           FontSize="11"
                                            Margin="0,0,0,2" />
                                 <TextBox Text="{Binding GridRows}"
                                          IsReadOnly="True"
@@ -75,7 +75,7 @@
                             <TextBlock Grid.Column="0"
                                        Text="Padding (px)"
                                        Foreground="{StaticResource TextMuted}"
-                                       FontSize="10"
+                                       FontSize="12"
                                        VerticalAlignment="Center" />
                             <TextBox Grid.Column="2"
                                      Text="{Binding Padding, UpdateSourceTrigger=PropertyChanged}"
@@ -85,7 +85,7 @@
                         <StackPanel Margin="0,6,0,0">
                             <TextBlock Text="最大 Atlas 尺寸"
                                        Foreground="{StaticResource TextMuted}"
-                                       FontSize="9"
+                                       FontSize="11"
                                        Margin="0,0,0,2" />
                             <ComboBox SelectedValue="{Binding MaxAtlasSize}"
                                       SelectedValuePath="Tag">
@@ -110,20 +110,20 @@
                             <StackPanel>
                                 <TextBlock Text="JSON"
                                            Foreground="{StaticResource TextSecondary}"
-                                           FontSize="10" />
+                                           FontSize="12" />
                                 <TextBlock Text="Unity 格式"
                                            Foreground="{StaticResource TextMuted}"
-                                           FontSize="9" />
+                                           FontSize="11" />
                             </StackPanel>
                         </CheckBox>
                         <CheckBox IsChecked="{Binding ExportPlist}">
                             <StackPanel>
                                 <TextBlock Text="plist"
                                            Foreground="{StaticResource TextSecondary}"
-                                           FontSize="10" />
+                                           FontSize="12" />
                                 <TextBlock Text="Cocos 格式"
                                            Foreground="{StaticResource TextMuted}"
-                                           FontSize="9" />
+                                           FontSize="11" />
                             </StackPanel>
                         </CheckBox>
                     </StackPanel>
@@ -136,7 +136,7 @@
                             HorizontalAlignment="Stretch" />
                     <TextBlock Text="Ctrl+E"
                                Foreground="{StaticResource TextMuted}"
-                               FontSize="9"
+                               FontSize="11"
                                TextAlignment="Center"
                                Margin="0,3,0,0" />
                 </StackPanel>

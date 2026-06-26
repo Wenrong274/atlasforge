@@ -9,10 +9,13 @@ using AtlasForge.Services;
 using SkiaSharp;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
+using Cursors = System.Windows.Input.Cursors;
 using DataFormats = System.Windows.DataFormats;
 using DragDropEffects = System.Windows.DragDropEffects;
 using MessageBox = System.Windows.MessageBox;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Point = System.Windows.Point;
 using SolidColorBrush = System.Windows.Media.SolidColorBrush;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -24,6 +27,8 @@ public partial class UnpackerControl : UserControl
     private BitmapSource? _loadedImage;
     private List<SliceItem> _slices = new();
     private double _zoom = 1.0;
+    private bool _isDragging;
+    private Point _dragStart;
 
     public UnpackerControl()
     {
@@ -295,6 +300,26 @@ public partial class UnpackerControl : UserControl
         HighlightCanvas.Children.Add(border);
     }
 
+    private void SetZoom(double zoom)
+    {
+        _zoom = Math.Clamp(zoom, 0.1, 8.0);
+        ImageContainer.LayoutTransform = new ScaleTransform(_zoom, _zoom);
+    }
+
+    private void SetZoomAt(double newZoom, Point mousePos)
+    {
+        double contentX = (PreviewScroll.HorizontalOffset + mousePos.X) / _zoom;
+        double contentY = (PreviewScroll.VerticalOffset + mousePos.Y) / _zoom;
+
+        SetZoom(newZoom);
+
+        Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Render, () =>
+        {
+            PreviewScroll.ScrollToHorizontalOffset(contentX * _zoom - mousePos.X);
+            PreviewScroll.ScrollToVerticalOffset(contentY * _zoom - mousePos.Y);
+        });
+    }
+
     private void PreviewScroll_MouseWheel(object _, MouseWheelEventArgs e)
     {
         if (Keyboard.Modifiers != ModifierKeys.Control)
@@ -304,8 +329,51 @@ public partial class UnpackerControl : UserControl
 
         e.Handled = true;
         var factor = e.Delta > 0 ? 1.25 : 1.0 / 1.25;
-        _zoom = Math.Clamp(_zoom * factor, 0.1, 8.0);
-        ImageContainer.LayoutTransform = new ScaleTransform(_zoom, _zoom);
+        SetZoomAt(Math.Clamp(_zoom * factor, 0.1, 8.0), e.GetPosition(PreviewScroll));
+    }
+
+    private void PreviewScroll_MouseEnter(object _, MouseEventArgs e) => AnimateHints(0.15);
+
+    private void PreviewScroll_MouseLeave(object _, MouseEventArgs e)
+    {
+        _isDragging = false;
+        PreviewScroll.Cursor = Cursors.Arrow;
+        AnimateHints(1.0);
+    }
+
+    private void PreviewScroll_MouseLeftButtonDown(object _, MouseButtonEventArgs e)
+    {
+        _isDragging = true;
+        _dragStart = e.GetPosition(PreviewScroll);
+        PreviewScroll.CaptureMouse();
+        PreviewScroll.Cursor = Cursors.SizeAll;
+    }
+
+    private void PreviewScroll_MouseMove(object _, MouseEventArgs e)
+    {
+        if (!_isDragging)
+        {
+            return;
+        }
+
+        var pos = e.GetPosition(PreviewScroll);
+        var delta = _dragStart - pos;
+        _dragStart = pos;
+        PreviewScroll.ScrollToHorizontalOffset(PreviewScroll.HorizontalOffset + delta.X);
+        PreviewScroll.ScrollToVerticalOffset(PreviewScroll.VerticalOffset + delta.Y);
+    }
+
+    private void PreviewScroll_MouseLeftButtonUp(object _, MouseButtonEventArgs e)
+    {
+        _isDragging = false;
+        PreviewScroll.ReleaseMouseCapture();
+        PreviewScroll.Cursor = Cursors.Arrow;
+    }
+
+    private void AnimateHints(double toOpacity)
+    {
+        var anim = new System.Windows.Media.Animation.DoubleAnimation(toOpacity, TimeSpan.FromSeconds(0.2));
+        HintsOverlay.BeginAnimation(OpacityProperty, anim);
     }
 
     private async void Unpack_Click(object _, RoutedEventArgs e)
