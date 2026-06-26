@@ -31,20 +31,6 @@ public partial class MainWindow : System.Windows.Window
         }
     }
 
-    private async void OpenFiles_Click(object _, System.Windows.RoutedEventArgs e)
-    {
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "選擇 PNG 幀",
-            Filter = "PNG 圖片|*.png",
-            Multiselect = true
-        };
-
-        if (dialog.ShowDialog() == true && VM is not null)
-        {
-            await VM.LoadFramesAsync(dialog.FileNames);
-        }
-    }
 
     private bool _isUnpackerMode;
 

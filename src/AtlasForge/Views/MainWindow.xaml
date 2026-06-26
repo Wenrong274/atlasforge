@@ -68,10 +68,7 @@
                             Style="{StaticResource ToolbarButtonStyle}"
                             Margin="0,0,4,0"
                             Click="OpenFolder_Click" />
-                    <Button Content="📄 選擇檔案"
-                            Style="{StaticResource ToolbarButtonStyle}"
-                            Margin="0,0,4,0"
-                            Click="OpenFiles_Click" />
+
                     <Button Content="🗑 清除"
                             Style="{StaticResource ToolbarButtonStyle}"
                             Command="{Binding ClearFramesCommand}" />
