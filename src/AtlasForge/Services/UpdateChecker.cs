@@ -11,15 +11,15 @@ public record UpdateInfo(string LatestVersion, string DownloadUrl);
 
 public class UpdateChecker
 {
-    private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(5) };
-    private static readonly string _cacheDir = Path.Combine(
+    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(5) };
+    private static readonly string CacheDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AtlasForge");
-    private static readonly string _cachePath = Path.Combine(_cacheDir, "update-check.json");
+    private static readonly string CachePath = Path.Combine(CacheDir, "update-check.json");
     private const string ApiUrl = "https://api.github.com/repos/Wenrong274/AtlasForge/releases/latest";
 
     static UpdateChecker()
     {
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd("AtlasForge");
+        Http.DefaultRequestHeaders.UserAgent.ParseAdd("AtlasForge");
     }
 
     public async Task<UpdateInfo?> CheckAsync()
@@ -27,13 +27,17 @@ public class UpdateChecker
         var cached = TryLoadCache();
 
         if (cached != null && DateTime.UtcNow - cached.CheckedAt < TimeSpan.FromHours(24))
+        {
             return IsNewer(cached.LatestVersion) ? new UpdateInfo(cached.LatestVersion, cached.DownloadUrl) : null;
+        }
 
         try
         {
             var release = await FetchLatestAsync();
             if (release == null)
+            {
                 return null;
+            }
 
             SaveCache(new CacheData(DateTime.UtcNow, release.TagName, release.HtmlUrl));
             return IsNewer(release.TagName) ? new UpdateInfo(release.TagName, release.HtmlUrl) : null;
@@ -55,12 +59,14 @@ public class UpdateChecker
 
     private static CacheData? TryLoadCache()
     {
-        if (!File.Exists(_cachePath))
+        if (!File.Exists(CachePath))
+        {
             return null;
+        }
 
         try
         {
-            return JsonSerializer.Deserialize<CacheData>(File.ReadAllText(_cachePath));
+            return JsonSerializer.Deserialize<CacheData>(File.ReadAllText(CachePath));
         }
         catch
         {
@@ -70,13 +76,13 @@ public class UpdateChecker
 
     private static void SaveCache(CacheData data)
     {
-        Directory.CreateDirectory(_cacheDir);
-        File.WriteAllText(_cachePath, JsonSerializer.Serialize(data));
+        Directory.CreateDirectory(CacheDir);
+        File.WriteAllText(CachePath, JsonSerializer.Serialize(data));
     }
 
     private static async Task<ReleaseResponse?> FetchLatestAsync()
     {
-        using var resp = await _http.GetAsync(ApiUrl);
+        using var resp = await Http.GetAsync(ApiUrl);
         resp.EnsureSuccessStatusCode();
         return await resp.Content.ReadFromJsonAsync<ReleaseResponse>();
     }

@@ -11,7 +11,7 @@ public partial class MainWindow : System.Windows.Window
 
     private MainViewModel? VM => DataContext as MainViewModel;
 
-    private async void OpenFolder_Click(object sender, System.Windows.RoutedEventArgs e)
+    private async void OpenFolder_Click(object _, System.Windows.RoutedEventArgs e)
     {
         using var dialog = new System.Windows.Forms.FolderBrowserDialog
         {
@@ -26,7 +26,7 @@ public partial class MainWindow : System.Windows.Window
         }
     }
 
-    private async void OpenFiles_Click(object sender, System.Windows.RoutedEventArgs e)
+    private async void OpenFiles_Click(object _, System.Windows.RoutedEventArgs e)
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
         {

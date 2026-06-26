@@ -1,5 +1,3 @@
-﻿using System.Configuration;
-using System.Data;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -16,9 +14,9 @@ public partial class App : System.Windows.Application
         DispatcherUnhandledException += OnDispatcherUnhandledException;
     }
 
-    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    private void OnDispatcherUnhandledException(object _, DispatcherUnhandledExceptionEventArgs e)
     {
         System.Windows.MessageBox.Show(e.Exception.Message, "發生錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
     }
-}
+}

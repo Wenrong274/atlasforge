@@ -49,31 +49,58 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Row="1"
-                      HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto">
-            <Grid>
-                <Grid.Background>
-                    <DrawingBrush TileMode="Tile"
-                                  Viewport="0,0,16,16"
-                                  ViewportUnits="Absolute">
-                        <DrawingBrush.Drawing>
-                            <DrawingGroup>
-                                <GeometryDrawing Brush="#1A1A2E" Geometry="M0,0 H16 V16 H0Z" />
-                                <GeometryDrawing Brush="#12121E" Geometry="M0,0 H8 V8 H0Z M8,8 H16 V16 H8Z" />
-                            </DrawingGroup>
-                        </DrawingBrush.Drawing>
-                    </DrawingBrush>
-                </Grid.Background>
-                <Image x:Name="PreviewImage"
-                       Stretch="None"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Margin="16"
-                       Source="{Binding AtlasPreview}"
-                       RenderOptions.BitmapScalingMode="NearestNeighbor" />
-            </Grid>
-        </ScrollViewer>
+        <Grid Grid.Row="1">
+            <ScrollViewer x:Name="PreviewScroll"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          PreviewMouseWheel="PreviewScroll_MouseWheel"
+                          MouseEnter="PreviewScroll_MouseEnter"
+                          MouseLeave="PreviewScroll_MouseLeave"
+                          MouseLeftButtonDown="PreviewScroll_MouseLeftButtonDown"
+                          MouseMove="PreviewScroll_MouseMove"
+                          MouseLeftButtonUp="PreviewScroll_MouseLeftButtonUp">
+                <Grid>
+                    <Grid.Background>
+                        <DrawingBrush TileMode="Tile"
+                                      Viewport="0,0,16,16"
+                                      ViewportUnits="Absolute">
+                            <DrawingBrush.Drawing>
+                                <DrawingGroup>
+                                    <GeometryDrawing Brush="#1A1A2E" Geometry="M0,0 H16 V16 H0Z" />
+                                    <GeometryDrawing Brush="#12121E" Geometry="M0,0 H8 V8 H0Z M8,8 H16 V16 H8Z" />
+                                </DrawingGroup>
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Grid.Background>
+                    <Image x:Name="PreviewImage"
+                           Stretch="None"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="16"
+                           Source="{Binding AtlasPreview}"
+                           RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                </Grid>
+            </ScrollViewer>
+
+            <!-- 操作提示浮層 -->
+            <Border x:Name="HintsOverlay"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    Margin="12"
+                    Background="#CC1E293B"
+                    CornerRadius="6"
+                    Padding="8,5"
+                    IsHitTestVisible="False">
+                <StackPanel>
+                    <TextBlock FontSize="10" Foreground="#64748B">
+                        <Run Text="Ctrl + 滾輪" FontFamily="Consolas" /><Run Text="　縮放" />
+                    </TextBlock>
+                    <TextBlock FontSize="10" Foreground="#64748B" Margin="0,2,0,0">
+                        <Run Text="拖曳" /><Run Text="　　　　移動" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+        </Grid>
 
         <Border Grid.Row="2"
                 Background="#0F172A"

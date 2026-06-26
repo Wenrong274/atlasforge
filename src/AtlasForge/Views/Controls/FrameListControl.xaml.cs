@@ -19,7 +19,7 @@ public partial class FrameListControl : System.Windows.Controls.UserControl
 
     private MainViewModel? VM => DataContext as MainViewModel;
 
-    private void DropZone_DragOver(object sender, WpfDragEventArgs e)
+    private void DropZone_DragOver(object _, WpfDragEventArgs e)
     {
         e.Effects = e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop)
             ? System.Windows.DragDropEffects.Copy
@@ -27,7 +27,7 @@ public partial class FrameListControl : System.Windows.Controls.UserControl
         e.Handled = true;
     }
 
-    private async void DropZone_Drop(object sender, WpfDragEventArgs e)
+    private async void DropZone_Drop(object _, WpfDragEventArgs e)
     {
         if (e.Data.GetData(System.Windows.DataFormats.FileDrop) is string[] files && VM is not null)
         {
@@ -35,13 +35,13 @@ public partial class FrameListControl : System.Windows.Controls.UserControl
         }
     }
 
-    private void List_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void List_PreviewMouseLeftButtonDown(object _, MouseButtonEventArgs e)
     {
         _dragStart = e.GetPosition(null);
         _dragItem = (e.OriginalSource as FrameworkElement)?.DataContext as FrameItemViewModel;
     }
 
-    private void List_PreviewMouseMove(object sender, WpfMouseEventArgs e)
+    private void List_PreviewMouseMove(object _, WpfMouseEventArgs e)
     {
         if (e.LeftButton != MouseButtonState.Pressed || _dragItem is null)
         {
@@ -56,7 +56,7 @@ public partial class FrameListControl : System.Windows.Controls.UserControl
         }
     }
 
-    private async void List_Drop(object sender, WpfDragEventArgs e)
+    private async void List_Drop(object _, WpfDragEventArgs e)
     {
         if (VM is null)
         {
@@ -92,7 +92,7 @@ public partial class FrameListControl : System.Windows.Controls.UserControl
         _dragItem = null;
     }
 
-    private async void SortButton_Click(object sender, RoutedEventArgs e)
+    private async void SortButton_Click(object _, RoutedEventArgs e)
     {
         if (VM is null)
         {

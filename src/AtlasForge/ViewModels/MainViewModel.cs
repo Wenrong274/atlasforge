@@ -298,7 +298,9 @@ public partial class MainViewModel : ObservableObject
     private void OpenUpdate()
     {
         if (string.IsNullOrEmpty(UpdateUrl))
+        {
             return;
+        }
 
         using var process = System.Diagnostics.Process.Start(
             new System.Diagnostics.ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
@@ -315,7 +317,9 @@ public partial class MainViewModel : ObservableObject
         {
             var info = await new UpdateChecker().CheckAsync();
             if (info is null)
+            {
                 return;
+            }
 
             RunOnUiThread(() =>
             {
@@ -377,7 +381,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private void OnAnimationTick(object? sender, EventArgs e)
+    private void OnAnimationTick(object? _, EventArgs e)
     {
         StepFrame(1);
     }

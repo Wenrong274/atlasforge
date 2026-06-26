@@ -16,5 +16,5 @@ jobs:
           dotnet-version: '8.0.x'
       - run: dotnet restore AtlasForge.sln
       - run: dotnet format AtlasForge.sln --verify-no-changes
-      - run: dotnet build AtlasForge.sln --no-restore -c Release
+      - run: dotnet build AtlasForge.sln --no-restore -c Release /warnaserror
       - run: dotnet test AtlasForge.sln --no-build -c Release
