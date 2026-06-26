@@ -1,9 +1,8 @@
+using System.Reflection;
 using System.Text.Json;
 using System.Xml.Linq;
-
 using AtlasForge.Models;
 using AtlasForge.Services;
-
 using SkiaSharp;
 
 namespace AtlasForge.Tests.Services;
@@ -78,6 +77,22 @@ public class ExportServiceTests : IDisposable
         var meta = doc.RootElement.GetProperty("meta");
         Assert.Equal("fire.png", meta.GetProperty("image").GetString());
         Assert.Equal(64, meta.GetProperty("size").GetProperty("w").GetInt32());
+    }
+
+    [Fact]
+    public void ExportJson_MetaVersionUsesAssemblyInformationalVersion()
+    {
+        var atlas = MakeAtlas();
+        var settings = new ExportSettings { OutputPath = _tmpDir, ExportPng = false, ExportJson = true };
+        var expectedVersion = typeof(ExportService).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+            .InformationalVersion;
+
+        _svc.Export(atlas, settings, "fire");
+
+        using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(_tmpDir, "fire.json")));
+        var meta = doc.RootElement.GetProperty("meta");
+        Assert.Equal(expectedVersion, meta.GetProperty("version").GetString());
     }
 
     [Fact]

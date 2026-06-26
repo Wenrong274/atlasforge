@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using System.Xml.Linq;
 
@@ -63,7 +64,7 @@ public class ExportService
             meta = new
             {
                 app = "AtlasForge",
-                version = "1.0.0",
+                version = GetAppVersion(),
                 image = imageFilename,
                 format = "RGBA8888",
                 size = new { w = atlasData.Atlas.Width, h = atlasData.Atlas.Height },
@@ -125,4 +126,11 @@ public class ExportService
 
         document.Save(path);
     }
+
+    private static string GetAppVersion() =>
+        typeof(ExportService).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion
+        ?? typeof(ExportService).Assembly.GetName().Version?.ToString()
+        ?? "0.0.0";
 }
