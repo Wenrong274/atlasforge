@@ -19,4 +19,4 @@ public partial class App : System.Windows.Application
         System.Windows.MessageBox.Show(e.Exception.Message, "發生錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
     }
-}
+}

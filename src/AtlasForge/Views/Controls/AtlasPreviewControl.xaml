@@ -72,13 +72,19 @@
                             </DrawingBrush.Drawing>
                         </DrawingBrush>
                     </Grid.Background>
-                    <Image x:Name="PreviewImage"
-                           Stretch="None"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Margin="16"
-                           Source="{Binding AtlasPreview}"
-                           RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                    <Grid x:Name="ImageContainer"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Margin="16">
+                        <Image x:Name="PreviewImage"
+                               Stretch="None"
+                               Source="{Binding AtlasPreview}"
+                               RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                        <Canvas x:Name="HighlightCanvas"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                IsHitTestVisible="False" />
+                    </Grid>
                 </Grid>
             </ScrollViewer>
 

@@ -1,4 +1,4 @@
-﻿namespace AtlasForge.Tests;
+namespace AtlasForge.Tests;
 
 public class UnitTest1
 {

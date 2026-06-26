@@ -1,7 +1,5 @@
 using AtlasForge.ViewModels;
 
-using Xunit;
-
 namespace AtlasForge.Tests.ViewModels;
 
 public class MainViewModelTests

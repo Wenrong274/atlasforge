@@ -14,7 +14,11 @@ public partial class AtlasPreviewControl : System.Windows.Controls.UserControl
     private bool _isDragging;
     private System.Windows.Point _dragStart;
 
-    public AtlasPreviewControl() => InitializeComponent();
+    public AtlasPreviewControl()
+    {
+        InitializeComponent();
+        DataContextChanged += AtlasPreviewControl_DataContextChanged;
+    }
 
     private MainViewModel? VM => DataContext as MainViewModel;
 
@@ -23,6 +27,7 @@ public partial class AtlasPreviewControl : System.Windows.Controls.UserControl
         VM?.ShowAtlasView();
         AtlasTabBtn.Style = (Style)FindResource("TabActiveStyle");
         AnimTabBtn.Style = (Style)FindResource("TabInactiveStyle");
+        UpdateHighlight();
     }
 
     private void AnimTab_Click(object _, RoutedEventArgs e)
@@ -30,6 +35,7 @@ public partial class AtlasPreviewControl : System.Windows.Controls.UserControl
         AnimTabBtn.Style = (Style)FindResource("TabActiveStyle");
         AtlasTabBtn.Style = (Style)FindResource("TabInactiveStyle");
         VM?.ToggleAnimationCommand.Execute(null);
+        UpdateHighlight();
     }
 
     private void ZoomIn_Click(object _, RoutedEventArgs e) => SetZoom(_zoom * 1.25);
@@ -39,8 +45,65 @@ public partial class AtlasPreviewControl : System.Windows.Controls.UserControl
     private void SetZoom(double zoom)
     {
         _zoom = Math.Clamp(zoom, 0.1, 8.0);
-        PreviewImage.LayoutTransform = new ScaleTransform(_zoom, _zoom);
+        ImageContainer.LayoutTransform = new ScaleTransform(_zoom, _zoom);
         ZoomLabel.Text = $"{_zoom:P0}";
+    }
+
+    private void AtlasPreviewControl_DataContextChanged(object _, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.OldValue is MainViewModel oldVm)
+        {
+            oldVm.PropertyChanged -= VM_PropertyChanged;
+        }
+        if (e.NewValue is MainViewModel newVm)
+        {
+            newVm.PropertyChanged += VM_PropertyChanged;
+        }
+        UpdateHighlight();
+    }
+
+    private void VM_PropertyChanged(object? _, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.SelectedFrame) ||
+            e.PropertyName == nameof(MainViewModel.CurrentAtlas) ||
+            e.PropertyName == nameof(MainViewModel.AtlasPreview))
+        {
+            UpdateHighlight();
+        }
+    }
+
+    private bool IsAtlasMode => AtlasTabBtn != null && AtlasTabBtn.Style == (Style)FindResource("TabActiveStyle");
+
+    private void UpdateHighlight()
+    {
+        HighlightCanvas.Children.Clear();
+
+        if (VM is null || VM.SelectedFrame is null || VM.CurrentAtlas is null || !IsAtlasMode)
+        {
+            return;
+        }
+
+        var index = VM.SelectedFrame.OrderIndex;
+        if (index < 0 || index >= VM.CurrentAtlas.Frames.Count)
+        {
+            return;
+        }
+
+        var rect = VM.CurrentAtlas.Frames[index];
+
+        var highlight = new System.Windows.Controls.Border
+        {
+            Width = rect.Width,
+            Height = rect.Height,
+            BorderThickness = new Thickness(2),
+            BorderBrush = (System.Windows.Media.Brush)FindResource("Accent") ?? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(2, 132, 199)),
+            Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(40, 2, 132, 199)),
+            IsHitTestVisible = false
+        };
+
+        System.Windows.Controls.Canvas.SetLeft(highlight, rect.X);
+        System.Windows.Controls.Canvas.SetTop(highlight, rect.Y);
+        HighlightCanvas.Children.Add(highlight);
     }
 
     private void SetZoomAt(double newZoom, System.Windows.Point mousePos)

@@ -74,8 +74,7 @@ public partial class FrameListControl : System.Windows.Controls.UserControl
             return;
         }
 
-        var target = (e.OriginalSource as FrameworkElement)?.DataContext as FrameItemViewModel;
-        if (target is null || ReferenceEquals(target, _dragItem))
+        if ((e.OriginalSource as FrameworkElement)?.DataContext is not FrameItemViewModel target || ReferenceEquals(target, _dragItem))
         {
             return;
         }
