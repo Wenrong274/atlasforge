@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -18,6 +18,11 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="SkiaSharp" Version="2.88.8" />
     <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\UnpackWindow.xaml.cs" />
+    <Page Remove="Views\UnpackWindow.xaml" />
   </ItemGroup>
 
 </Project>

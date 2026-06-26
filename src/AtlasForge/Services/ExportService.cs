@@ -80,13 +80,16 @@ public class ExportService
         var framesDict = new XElement("dict");
         foreach (var frame in atlasData.Frames)
         {
+            var ox = frame.OffsetX + frame.Width / 2.0 - frame.SourceWidth / 2.0;
+            var oy = frame.SourceHeight / 2.0 - (frame.OffsetY + frame.Height / 2.0);
+
             framesDict.Add(
                 new XElement("key", $"{frame.Name}.png"),
                 new XElement("dict",
                     new XElement("key", "frame"),
                     new XElement("string", $"{{{{{frame.X},{frame.Y}}},{{{frame.Width},{frame.Height}}}}}"),
                     new XElement("key", "offset"),
-                    new XElement("string", $"{{{frame.OffsetX},{frame.OffsetY}}}"),
+                    new XElement("string", $"{{{(int)Math.Round(ox)},{(int)Math.Round(oy)}}}"),
                     new XElement("key", "rotated"),
                     new XElement("false"),
                     new XElement("key", "sourceColorRect"),

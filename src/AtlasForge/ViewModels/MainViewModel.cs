@@ -70,7 +70,7 @@ public partial class MainViewModel : ObservableObject
     private bool _exportJson;
 
     [ObservableProperty]
-    private bool _exportPlist;
+    private bool _exportPlist = true;
 
     [ObservableProperty]
     private string _outputPath = "";

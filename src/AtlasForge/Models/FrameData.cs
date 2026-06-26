@@ -7,4 +7,6 @@ public record FrameData(
     SKBitmap Bitmap,
     SKRectI TrimRect,
     int OriginalWidth,
-    int OriginalHeight);
+    int OriginalHeight,
+    int PackedOffsetX = 0,
+    int PackedOffsetY = 0);

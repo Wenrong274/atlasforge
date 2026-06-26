@@ -36,7 +36,8 @@ public partial class FrameItemViewModel : ObservableObject
 
     private void LoadThumbnail()
     {
-        using var bitmap = SKBitmap.Decode(FilePath);
+        using var fileStream = File.OpenRead(FilePath);
+        using var bitmap = SKBitmap.Decode(fileStream);
         if (bitmap is null)
         {
             return;

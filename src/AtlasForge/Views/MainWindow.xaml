@@ -20,7 +20,7 @@
     <DockPanel>
         <Border DockPanel.Dock="Top"
                 Background="{StaticResource BgMid}"
-                BorderBrush="{StaticResource BorderColor}"
+                BorderBrush="{DynamicResource BorderColor}"
                 BorderThickness="0,0,0,1"
                 Height="36">
             <DockPanel VerticalAlignment="Center"
@@ -31,7 +31,8 @@
                         Content="{Binding UpdateBadgeText}"
                         Command="{Binding OpenUpdateCommand}"
                         Visibility="{Binding HasUpdate, Converter={StaticResource BoolToVis}}" />
-                <TextBlock DockPanel.Dock="Left"
+                <TextBlock x:Name="TitleLbl"
+                           DockPanel.Dock="Left"
                            Text="⚡ AtlasForge"
                            Foreground="#38BDF8"
                            FontWeight="Bold"
@@ -41,43 +42,69 @@
                            Width="1"
                            Background="{StaticResource BgLight}"
                            Margin="12,6" />
-                <Button DockPanel.Dock="Left"
-                        Content="📂 開啟資料夾"
-                        Style="{StaticResource ToolbarButtonStyle}"
+
+                <!-- 模式頁籤選擇器 -->
+                <Button x:Name="PackerTabBtn"
+                        DockPanel.Dock="Left"
+                        Content="⚡ 合圖打包"
+                        Style="{StaticResource TabActiveStyle}"
                         Margin="0,0,4,0"
-                        Click="OpenFolder_Click" />
-                <Button DockPanel.Dock="Left"
-                        Content="📄 選擇檔案"
-                        Style="{StaticResource ToolbarButtonStyle}"
+                        Click="PackerTab_Click" />
+                <Button x:Name="UnpackerTabBtn"
+                        DockPanel.Dock="Left"
+                        Content="🔧 序列拆圖"
+                        Style="{StaticResource TabInactiveStyle}"
                         Margin="0,0,4,0"
-                        Click="OpenFiles_Click" />
-                <Button DockPanel.Dock="Left"
-                        Content="🗑 清除"
-                        Style="{StaticResource ToolbarButtonStyle}"
-                        Command="{Binding ClearFramesCommand}" />
+                        Click="UnpackerTab_Click" />
+
+                <Separator DockPanel.Dock="Left"
+                           Width="1"
+                           Background="{StaticResource BgLight}"
+                           Margin="12,6" />
+
+                <!-- 打包模式工具列 (在拆圖模式下會隱藏) -->
+                <StackPanel x:Name="PackerToolbar" DockPanel.Dock="Left" Orientation="Horizontal" Visibility="Visible">
+                    <Button Content="📂 開啟資料夾"
+                            Style="{StaticResource ToolbarButtonStyle}"
+                            Margin="0,0,4,0"
+                            Click="OpenFolder_Click" />
+                    <Button Content="📄 選擇檔案"
+                            Style="{StaticResource ToolbarButtonStyle}"
+                            Margin="0,0,4,0"
+                            Click="OpenFiles_Click" />
+                    <Button Content="🗑 清除"
+                            Style="{StaticResource ToolbarButtonStyle}"
+                            Command="{Binding ClearFramesCommand}" />
+                </StackPanel>
             </DockPanel>
         </Border>
 
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="190" MinWidth="140" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*" MinWidth="300" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="185" MinWidth="160" />
-            </Grid.ColumnDefinitions>
+            <!-- Packer 模式主要介面 -->
+            <Grid x:Name="PackerMainGrid" Visibility="Visible">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="190" MinWidth="140" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" MinWidth="300" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="185" MinWidth="160" />
+                </Grid.ColumnDefinitions>
 
-            <ctrl:FrameListControl Grid.Column="0" DataContext="{Binding}" />
-            <GridSplitter Grid.Column="1"
-                          Width="5"
-                          Background="{StaticResource BorderColor}"
-                          HorizontalAlignment="Stretch" />
-            <ctrl:AtlasPreviewControl Grid.Column="2" DataContext="{Binding}" />
-            <GridSplitter Grid.Column="3"
-                          Width="5"
-                          Background="{StaticResource BorderColor}"
-                          HorizontalAlignment="Stretch" />
-            <ctrl:SettingsPanel Grid.Column="4" DataContext="{Binding}" />
+                <ctrl:FrameListControl Grid.Column="0" DataContext="{Binding}" />
+                <GridSplitter Grid.Column="1"
+                              Width="5"
+                              Background="{DynamicResource BorderColor}"
+                              HorizontalAlignment="Stretch" />
+                <ctrl:AtlasPreviewControl Grid.Column="2" DataContext="{Binding}" />
+                <GridSplitter Grid.Column="3"
+                              Width="5"
+                              Background="{DynamicResource BorderColor}"
+                              HorizontalAlignment="Stretch" />
+                <ctrl:SettingsPanel Grid.Column="4" DataContext="{Binding}" />
+            </Grid>
+
+            <!-- Unpacker 模式主要介面 -->
+            <ctrl:UnpackerControl x:Name="UnpackerMainGrid" Visibility="Collapsed" />
         </Grid>
     </DockPanel>
 </Window>

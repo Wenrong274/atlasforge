@@ -59,16 +59,17 @@ public class GridPackingService
             var y = row * frameHeight;
 
             canvas.DrawBitmap(frames[index].Bitmap, x, y);
+            var frame = frames[index];
             spriteRects.Add(new SpriteRect(
-                Path.GetFileNameWithoutExtension(frames[index].FilePath),
-                x,
-                y,
-                frameWidth,
-                frameHeight,
-                0,
-                0,
-                frames[index].OriginalWidth,
-                frames[index].OriginalHeight));
+                Path.GetFileNameWithoutExtension(frame.FilePath),
+                x + frame.PackedOffsetX,
+                y + frame.PackedOffsetY,
+                frame.TrimRect.Width,
+                frame.TrimRect.Height,
+                frame.TrimRect.Left,
+                frame.TrimRect.Top,
+                frame.OriginalWidth,
+                frame.OriginalHeight));
         }
 
         return new AtlasData(

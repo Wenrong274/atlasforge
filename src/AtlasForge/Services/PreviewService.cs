@@ -1,4 +1,5 @@
-using System.IO;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 using AtlasForge.Models;
@@ -20,30 +21,46 @@ public class PreviewService
         }
 
         var frame = atlasData.Frames[frameIndex];
-        var frameBitmap = new SKBitmap(frame.Width, frame.Height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        var frameBitmap = new SKBitmap(frame.SourceWidth, frame.SourceHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
         using var canvas = new SKCanvas(frameBitmap);
         canvas.Clear(SKColors.Transparent);
         canvas.DrawBitmap(
             atlasData.Atlas,
             SKRect.Create(frame.X, frame.Y, frame.Width, frame.Height),
-            SKRect.Create(0, 0, frame.Width, frame.Height));
+            SKRect.Create(frame.OffsetX, frame.OffsetY, frame.Width, frame.Height));
 
         return BitmapFromSKBitmap(frameBitmap);
     }
 
     private static BitmapSource BitmapFromSKBitmap(SKBitmap bitmap)
     {
-        using var image = SKImage.FromBitmap(bitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-        using var stream = new MemoryStream(data.ToArray());
+        var width = bitmap.Width;
+        var height = bitmap.Height;
 
-        var bitmapImage = new BitmapImage();
-        bitmapImage.BeginInit();
-        bitmapImage.StreamSource = stream;
-        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-        bitmapImage.EndInit();
-        bitmapImage.Freeze();
+        // Ensure we work with Bgra8888 for direct compatibility with WPF's PixelFormats.Bgra32
+        using var bgraBitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+        using (var canvas = new SKCanvas(bgraBitmap))
+        {
+            canvas.DrawBitmap(bitmap, 0, 0);
+        }
 
-        return bitmapImage;
+        var writeableBitmap = new WriteableBitmap(
+            width,
+            height,
+            96.0, // Force 96 DPI
+            96.0, // Force 96 DPI
+            PixelFormats.Bgra32,
+            null
+        );
+
+        writeableBitmap.WritePixels(
+            new Int32Rect(0, 0, width, height),
+            bgraBitmap.GetPixels(),
+            bgraBitmap.RowBytes * height,
+            bgraBitmap.RowBytes
+        );
+
+        writeableBitmap.Freeze();
+        return writeableBitmap;
     }
 }

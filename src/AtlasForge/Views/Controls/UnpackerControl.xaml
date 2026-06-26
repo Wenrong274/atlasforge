@@ -1,0 +1,215 @@
+<UserControl x:Class="AtlasForge.Views.Controls.UnpackerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource BgDark}">
+    <UserControl.Resources>
+        <!-- 科技紫主題配色 -->
+        <SolidColorBrush x:Key="PurpleAccent" Color="#8B5CF6" />
+        <SolidColorBrush x:Key="PurpleAccentHover" Color="#7C3AED" />
+        <SolidColorBrush x:Key="PurpleSelection" Color="#288B5CF6" />
+
+        <!-- 紫色按鈕樣式 -->
+        <Style x:Key="PurpleButtonStyle" TargetType="Button" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Background" Value="{StaticResource PurpleAccent}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="8,4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource PurpleAccentHover}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <!-- 1. 控制欄 -->
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="5" />
+            <!-- 2. 切片清單欄 -->
+            <ColumnDefinition Width="190" />
+            <ColumnDefinition Width="5" />
+            <!-- 3. 大圖預覽欄 -->
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- 1. 控制欄 -->
+        <Grid Grid.Column="0" Margin="0,0,5,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <TextBlock Text="🔧 拆圖參數設定" Style="{StaticResource SectionLabelStyle}" Foreground="{StaticResource PurpleAccent}" />
+                
+                <TextBlock Text="合圖路徑 (.png)" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,2" FontSize="10" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="ImagePathTxt" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" AllowDrop="True" PreviewDragOver="Txt_DragOver" Drop="Image_Drop" />
+                    <Button Grid.Column="1" Content="📄" Style="{StaticResource ToolbarButtonStyle}" Margin="4,0,0,0" Click="BrowseImage_Click" />
+                </Grid>
+
+                <TextBlock Text="切分模式" Foreground="{StaticResource TextSecondary}" Margin="0,10,0,2" FontSize="10" />
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,8">
+                    <RadioButton x:Name="ModeDescRadio" Content="描述檔 (JSON/Plist)" Foreground="{StaticResource TextPrimary}" IsChecked="True" Checked="Mode_Checked" Margin="0,0,10,0" />
+                    <RadioButton x:Name="ModeGridRadio" Content="網格 (Grid)" Foreground="{StaticResource TextPrimary}" Checked="Mode_Checked" />
+                </StackPanel>
+
+                <!-- 描述檔輸入區 -->
+                <StackPanel x:Name="DescPanel">
+                    <TextBlock Text="描述檔路徑" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,2" FontSize="10" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="DescPathTxt" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" AllowDrop="True" PreviewDragOver="Txt_DragOver" Drop="Desc_Drop" />
+                        <Button Grid.Column="1" Content="📄" Style="{StaticResource ToolbarButtonStyle}" Margin="4,0,0,0" Click="BrowseDesc_Click" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- 網格輸入區 (預設隱藏) -->
+                <StackPanel x:Name="GridPanel" Visibility="Collapsed">
+                    <TextBlock Text="網格切分設定" Foreground="{StaticResource TextSecondary}" Margin="0,5,0,2" FontSize="10" />
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="行數 (Cols)" Foreground="{StaticResource TextMuted}" FontSize="9" />
+                            <TextBox x:Name="GridColsTxt" Text="4" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" TextChanged="GridSettings_TextChanged" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="列數 (Rows)" Foreground="{StaticResource TextMuted}" FontSize="9" />
+                            <TextBox x:Name="GridRowsTxt" Text="4" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" TextChanged="GridSettings_TextChanged" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="4">
+                            <TextBlock Text="間距 (Padding)" Foreground="{StaticResource TextMuted}" FontSize="9" />
+                            <TextBox x:Name="GridPaddingTxt" Text="0" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" TextChanged="GridSettings_TextChanged" />
+                        </StackPanel>
+                    </Grid>
+                    <Button Content="🪄 自動偵測網格" Style="{StaticResource PurpleButtonStyle}" Height="22" Margin="0,6,0,0" Click="AutoDetectGrid_Click" />
+                </StackPanel>
+
+                <TextBlock Text="輸出資料夾" Foreground="{StaticResource TextSecondary}" Margin="0,10,0,2" FontSize="10" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="OutputDirTxt" Height="22" Background="{StaticResource BgLight}" Foreground="{StaticResource TextPrimary}" BorderThickness="0" Padding="3,1" />
+                    <Button Grid.Column="1" Content="📁" Style="{StaticResource ToolbarButtonStyle}" Margin="4,0,0,0" Click="BrowseOutput_Click" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                <TextBlock x:Name="StatusLbl" Text="等待預覽分析..." Foreground="{StaticResource TextMuted}" FontSize="10" Margin="0,0,0,5" />
+                <ProgressBar x:Name="UnpackProgress" Height="8" Background="{StaticResource BgMid}" Foreground="{StaticResource PurpleAccent}" BorderThickness="0" Margin="0,0,0,8" Visibility="Collapsed" />
+                <Button Content="🔍 預覽分析" Style="{StaticResource PurpleButtonStyle}" Height="28" Margin="0,0,0,6" Click="Preview_Click" />
+                <Button Content="🚀 開始拆分" Style="{StaticResource PurpleButtonStyle}" Height="28" Click="Unpack_Click" />
+            </StackPanel>
+        </Grid>
+
+        <GridSplitter Grid.Column="1" Width="5" Background="{DynamicResource BorderColor}" HorizontalAlignment="Stretch" />
+
+        <!-- 2. 中間切片清單欄 -->
+        <Grid Grid.Column="2" Margin="5,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="📋 切片清單" Style="{StaticResource SectionLabelStyle}" Margin="0,0,0,5" />
+            <ListBox Grid.Row="1" x:Name="SliceListBox" Background="{StaticResource BgMid}" BorderThickness="0" SelectionChanged="SliceListBox_SelectionChanged">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                        <Setter Property="Padding" Value="4" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Padding="4">
+                                        <ContentPresenter />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource PurpleSelection}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="32" Height="32" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" Background="{StaticResource BgDark}">
+                                <Image Source="{Binding Thumbnail}" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Foreground="{StaticResource TextMuted}" FontSize="9">
+                                    <Run Text="{Binding Width, Mode=OneWay}" /><Run Text="x" /><Run Text="{Binding Height, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <GridSplitter Grid.Column="3" Width="5" Background="{DynamicResource BorderColor}" HorizontalAlignment="Stretch" />
+
+        <!-- 3. 右側大圖預覽欄 -->
+        <Grid Grid.Column="4" Margin="5,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="🖼 合圖預覽 (點選左欄項目以高亮顯示)" Style="{StaticResource SectionLabelStyle}" Margin="0,0,0,5" />
+            
+            <ScrollViewer Grid.Row="1" x:Name="PreviewScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Grid.Background>
+                        <DrawingBrush TileMode="Tile" Viewport="0,0,16,16" ViewportUnits="Absolute">
+                            <DrawingBrush.Drawing>
+                                <DrawingGroup>
+                                    <GeometryDrawing Brush="#1A1A2E" Geometry="M0,0 H16 V16 H0Z" />
+                                    <GeometryDrawing Brush="#12121E" Geometry="M0,0 H8 V8 H0Z M8,8 H16 V16 H8Z" />
+                                </DrawingGroup>
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Grid.Background>
+
+                    <Grid x:Name="ImageContainer" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16">
+                        <Image x:Name="PreviewImage" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+                        <Canvas x:Name="HighlightCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" />
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

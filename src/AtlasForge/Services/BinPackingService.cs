@@ -69,12 +69,12 @@ public class BinPackingService
             canvas.DrawBitmap(frame.Bitmap, placement.X, placement.Y);
             spriteRects.Add(new SpriteRect(
                 Path.GetFileNameWithoutExtension(frame.FilePath),
-                placement.X,
-                placement.Y,
-                placement.Width,
-                placement.Height,
-                0,
-                0,
+                placement.X + frame.PackedOffsetX,
+                placement.Y + frame.PackedOffsetY,
+                frame.TrimRect.Width,
+                frame.TrimRect.Height,
+                frame.TrimRect.Left,
+                frame.TrimRect.Top,
                 frame.OriginalWidth,
                 frame.OriginalHeight));
         }

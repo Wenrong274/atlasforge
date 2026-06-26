@@ -46,7 +46,7 @@
     </Style>
 
     <Style x:Key="TabActiveStyle" TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource Accent}" />
+        <Setter Property="Background" Value="{DynamicResource Accent}" />
         <Setter Property="Foreground" Value="#E0F2FE" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="12,3" />
@@ -99,7 +99,7 @@
     </Style>
 
     <Style x:Key="ExportButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource Accent}" />
+        <Setter Property="Background" Value="{DynamicResource Accent}" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontSize" Value="12" />
@@ -116,7 +116,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource AccentHover}" />
+                            <Setter Property="Background" Value="{DynamicResource AccentHover}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -148,7 +148,7 @@
                 <Setter Property="Background" Value="{StaticResource BgLight}" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource Accent}" />
+                <Setter Property="Background" Value="{DynamicResource Accent}" />
                 <Setter Property="Foreground" Value="White" />
             </Trigger>
         </Style.Triggers>

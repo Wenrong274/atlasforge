@@ -8,7 +8,8 @@ public class ImageProcessingService
 {
     public FrameData LoadFrame(string filePath)
     {
-        var bitmap = SKBitmap.Decode(filePath)
+        using var stream = System.IO.File.OpenRead(filePath);
+        var bitmap = SKBitmap.Decode(stream)
             ?? throw new InvalidOperationException($"Cannot decode: {filePath}");
         var trimRect = ComputeTrimRect(bitmap);
 
@@ -92,7 +93,9 @@ public class ImageProcessingService
         return frame with
         {
             Bitmap = normalized,
-            TrimRect = new SKRectI(0, 0, cellWidth, cellHeight)
+            TrimRect = sourceRect, // 保留原始裁切區域以記錄 Offset 與實際尺寸
+            PackedOffsetX = drawX,
+            PackedOffsetY = drawY
         };
     }
 }
