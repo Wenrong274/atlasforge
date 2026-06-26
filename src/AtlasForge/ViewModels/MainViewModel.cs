@@ -162,7 +162,9 @@ public partial class MainViewModel : ObservableObject
     {
         StopAnimation();
         Frames.Clear();
+        var oldAtlas = CurrentAtlas;
         CurrentAtlas = null;
+        oldAtlas?.Atlas?.Dispose();
         AtlasPreview = null;
         SelectedFrame = null;
         AnimationFrameIndex = 0;
@@ -204,23 +206,47 @@ public partial class MainViewModel : ObservableObject
         {
             var result = await Task.Run(() =>
             {
-                var frameData = paths.Select(_imageProcessor.LoadFrame).ToList();
-                var normalized = _imageProcessor.NormalizeFrames(frameData, AlphaTrim, Padding);
-                var atlas = settings.PackingMode == PackingMode.Grid
-                    ? _gridPacker.Pack(normalized, settings)
-                    : _binPacker.Pack(normalized, settings);
-                var preview = _preview.RenderAtlas(atlas);
-                var isPowerOfTwo = IsPowerOfTwo(atlas.Atlas.Width) && IsPowerOfTwo(atlas.Atlas.Height);
-                var emptyCells = atlas.Mode == PackingMode.Grid
-                    ? atlas.Columns * atlas.Rows - frameCount
-                    : 0;
+                List<FrameData>? frameData = null;
+                List<FrameData>? normalized = null;
+                try
+                {
+                    frameData = paths.Select(_imageProcessor.LoadFrame).ToList();
+                    normalized = _imageProcessor.NormalizeFrames(frameData, AlphaTrim, Padding);
+                    var atlas = settings.PackingMode == PackingMode.Grid
+                        ? _gridPacker.Pack(normalized, settings)
+                        : _binPacker.Pack(normalized, settings);
+                    var preview = _preview.RenderAtlas(atlas);
+                    var isPowerOfTwo = IsPowerOfTwo(atlas.Atlas.Width) && IsPowerOfTwo(atlas.Atlas.Height);
+                    var emptyCells = atlas.Mode == PackingMode.Grid
+                        ? atlas.Columns * atlas.Rows - frameCount
+                        : 0;
 
-                return (atlas, preview, isPowerOfTwo, emptyCells);
+                    return (atlas, preview, isPowerOfTwo, emptyCells);
+                }
+                finally
+                {
+                    if (frameData != null)
+                    {
+                        foreach (var f in frameData)
+                        {
+                            f.Bitmap?.Dispose();
+                        }
+                    }
+                    if (normalized != null)
+                    {
+                        foreach (var f in normalized)
+                        {
+                            f.Bitmap?.Dispose();
+                        }
+                    }
+                }
             });
 
             RunOnUiThread(() =>
             {
+                var oldAtlas = CurrentAtlas;
                 CurrentAtlas = result.atlas;
+                oldAtlas?.Atlas?.Dispose();
                 AtlasPreview = result.preview;
                 StatusMessage = $"{result.atlas.Atlas.Width}×{result.atlas.Atlas.Height}" +
                     $" · {(result.atlas.Mode == PackingMode.Grid ? $"{result.atlas.Columns}×{result.atlas.Rows} Grid" : "BinPack")}" +

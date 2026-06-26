@@ -50,6 +50,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
         run: |
-          gh release create "${{ github.ref_name }}" "$env:ASSET_NAME" `
-            --title "AtlasForge ${{ github.ref_name }}" `
-            --generate-notes
+          $tag = "${{ github.ref_name }}"
+          $notesPath = Join-Path "docs\release-notes" "$tag.md"
+          $releaseArgs = @(
+            "release",
+            "create",
+            $tag,
+            $env:ASSET_NAME,
+            "--title",
+            "AtlasForge $tag"
+          )
+
+          if (Test-Path $notesPath) {
+            $releaseArgs += @("--notes-file", $notesPath)
+          } else {
+            $releaseArgs += "--generate-notes"
+          }
+
+          gh @releaseArgs

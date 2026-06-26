@@ -71,91 +71,97 @@ public class UnpackService
             return list;
         }
 
-        var keys = framesDict.Elements("key").ToList();
-        var dicts = framesDict.Elements("dict").ToList();
-
-        for (var i = 0; i < keys.Count; i++)
+        XElement? currentKey = null;
+        foreach (var element in framesDict.Elements())
         {
-            var name = keys[i].Value;
-            var frameDict = dicts[i];
-
-            var keysInFrame = frameDict.Elements("key").ToList();
-            var frameStr = "";
-            var offsetStr = "";
-            var sourceSizeStr = "";
-            var sourceColorRectStr = "";
-            var rotated = false;
-
-            for (var j = 0; j < keysInFrame.Count; j++)
+            if (element.Name == "key")
             {
-                var k = keysInFrame[j].Value;
-                if (keysInFrame[j].NextNode is not XElement v)
-                {
-                    continue;
-                }
-
-                if (k == "frame")
-                {
-                    frameStr = v.Value;
-                }
-                else if (k == "offset")
-                {
-                    offsetStr = v.Value;
-                }
-                else if (k == "sourceSize")
-                {
-                    sourceSizeStr = v.Value;
-                }
-                else if (k == "sourceColorRect")
-                {
-                    sourceColorRectStr = v.Value;
-                }
-                else if (k == "rotated")
-                {
-                    rotated = v.Name.LocalName == "true";
-                }
+                currentKey = element;
             }
-
-            var (fx, fy, fw, fh) = ParseRect(frameStr);
-            var (sw, sh) = ParsePoint(sourceSizeStr);
-
-            // 如果有旋轉，plist 裡面的寬高代表的是合圖上的尺寸（已旋轉）
-            // 還原後原始被裁切的寬高為：Width = fh, Height = fw
-            var originalTrimmedWidth = rotated ? fh : fw;
-            var originalTrimmedHeight = rotated ? fw : fh;
-
-            var leftTopX = 0;
-            var leftTopY = 0;
-
-            if (!string.IsNullOrEmpty(sourceColorRectStr))
+            else if (element.Name == "dict" && currentKey is not null)
             {
-                var (scX, scY, _, _) = ParseRect(sourceColorRectStr);
-                leftTopX = scX;
-                leftTopY = scY;
+                var name = currentKey.Value;
+                var frameDict = element;
+                currentKey = null; // reset key
+
+                var keysInFrame = frameDict.Elements("key").ToList();
+                var frameStr = "";
+                var offsetStr = "";
+                var sourceSizeStr = "";
+                var sourceColorRectStr = "";
+                var rotated = false;
+
+                for (var j = 0; j < keysInFrame.Count; j++)
+                {
+                    var k = keysInFrame[j].Value;
+                    if (keysInFrame[j].NextNode is not XElement v)
+                    {
+                        continue;
+                    }
+
+                    if (k == "frame")
+                    {
+                        frameStr = v.Value;
+                    }
+                    else if (k == "offset")
+                    {
+                        offsetStr = v.Value;
+                    }
+                    else if (k == "sourceSize")
+                    {
+                        sourceSizeStr = v.Value;
+                    }
+                    else if (k == "sourceColorRect")
+                    {
+                        sourceColorRectStr = v.Value;
+                    }
+                    else if (k == "rotated")
+                    {
+                        rotated = v.Name.LocalName == "true";
+                    }
+                }
+
+                var (fx, fy, fw, fh) = ParseRect(frameStr);
+                var (sw, sh) = ParsePoint(sourceSizeStr);
+
+                // 如果有旋轉，plist 裡面的寬高代表的是合圖上的尺寸（已旋轉）
+                // 還原後原始被裁切的寬高為：Width = fh, Height = fw
+                var originalTrimmedWidth = rotated ? fh : fw;
+                var originalTrimmedHeight = rotated ? fw : fh;
+
+                var leftTopX = 0;
+                var leftTopY = 0;
+
+                if (!string.IsNullOrEmpty(sourceColorRectStr))
+                {
+                    var (scX, scY, _, _) = ParseRect(sourceColorRectStr);
+                    leftTopX = scX;
+                    leftTopY = scY;
+                }
+                else if (!string.IsNullOrEmpty(offsetStr))
+                {
+                    var (ox, oy) = ParsePoint(offsetStr);
+                    leftTopX = (sw - originalTrimmedWidth) / 2 + ox;
+                    leftTopY = (sh - originalTrimmedHeight) / 2 - oy; // plist 通常 Y 軸向上
+                }
+
+                var item = new SliceItem
+                {
+                    Name = Path.GetFileNameWithoutExtension(name),
+                    X = fx,
+                    Y = fy,
+                    Width = originalTrimmedWidth,
+                    Height = originalTrimmedHeight,
+                    OffsetX = Math.Max(0, leftTopX),
+                    OffsetY = Math.Max(0, leftTopY),
+                    SourceWidth = sw,
+                    SourceHeight = sh,
+                    Rotated = rotated
+                };
+
+                item.Thumbnail = CreateThumbnail(atlasSource, item.X, item.Y, item.Width, item.Height, item.Rotated);
+                list.Add(item);
             }
-            else if (!string.IsNullOrEmpty(offsetStr))
-            {
-                var (ox, oy) = ParsePoint(offsetStr);
-                leftTopX = (sw - originalTrimmedWidth) / 2 + ox;
-                leftTopY = (sh - originalTrimmedHeight) / 2 - oy; // plist 通常 Y 軸向上
-            }
-
-            var item = new SliceItem
-            {
-                Name = Path.GetFileNameWithoutExtension(name),
-                X = fx,
-                Y = fy,
-                Width = originalTrimmedWidth,
-                Height = originalTrimmedHeight,
-                OffsetX = Math.Max(0, leftTopX),
-                OffsetY = Math.Max(0, leftTopY),
-                SourceWidth = sw,
-                SourceHeight = sh,
-                Rotated = rotated
-            };
-
-            item.Thumbnail = CreateThumbnail(atlasSource, item.X, item.Y, item.Width, item.Height, item.Rotated);
-            list.Add(item);
         }
 
         return list;
@@ -164,6 +170,11 @@ public class UnpackService
     public List<SliceItem> GenerateGridSlices(int imgWidth, int imgHeight, int cols, int rows, int padding, BitmapSource atlasSource)
     {
         var list = new List<SliceItem>();
+        if (cols <= 0 || rows <= 0)
+        {
+            return list;
+        }
+
         var cellW = imgWidth / cols;
         var cellH = imgHeight / rows;
 
@@ -292,16 +303,28 @@ public class UnpackService
     private static (int X, int Y) ParsePoint(string s)
     {
         var parts = s.Trim('{', '}').Split(',');
-        return (int.Parse(parts[0]), int.Parse(parts[1]));
+        if (parts.Length < 2)
+        {
+            return (0, 0);
+        }
+        var x = (int)Math.Round(double.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture));
+        var y = (int)Math.Round(double.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture));
+        return (x, y);
     }
 
     private static (int X, int Y, int W, int H) ParseRect(string s)
     {
-        var cleaned = s.Replace(" ", "").Replace("{{", "").Replace("}}", "");
-        var parts = cleaned.Split("},{", StringSplitOptions.None);
-        var ptParts = parts[0].Split(',');
-        var szParts = parts[1].Split(',');
-        return (int.Parse(ptParts[0]), int.Parse(ptParts[1]), int.Parse(szParts[0]), int.Parse(szParts[1]));
+        var cleaned = s.Replace(" ", "").Replace("{{", "").Replace("}}", "").Replace("{", "").Replace("}", "");
+        var parts = cleaned.Split(',');
+        if (parts.Length < 4)
+        {
+            return (0, 0, 0, 0);
+        }
+        var x = (int)Math.Round(double.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture));
+        var y = (int)Math.Round(double.Parse(parts[1], System.Globalization.CultureInfo.InvariantCulture));
+        var w = (int)Math.Round(double.Parse(parts[2], System.Globalization.CultureInfo.InvariantCulture));
+        var h = (int)Math.Round(double.Parse(parts[3], System.Globalization.CultureInfo.InvariantCulture));
+        return (x, y, w, h);
     }
 
     public SKRectI ComputeTrimRect(SKBitmap bitmap)

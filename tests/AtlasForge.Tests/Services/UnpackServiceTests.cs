@@ -39,125 +39,146 @@ public class UnpackServiceTests
     [Fact]
     public void TestRoundtripPackAndUnpack()
     {
-        var sourceDir = @"D:\Dev\新增資料夾\Comp 1";
-        if (!Directory.Exists(sourceDir))
+        var tempDir = Path.Combine(Path.GetTempPath(), "AtlasForge_RoundtripTest_" + Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+
+        try
         {
-            return; // skip if directory doesn't exist (e.g. on build server)
+            // 1. Generate 3 dummy PNG files with different dimensions and transparent margins
+            var frameFiles = new List<string>();
+            var sizes = new[] { (40, 40), (50, 60), (30, 45) };
+            for (var i = 0; i < sizes.Length; i++)
+            {
+                var (w, h) = sizes[i];
+                var bmp = new SKBitmap(w, h, SKColorType.Rgba8888, SKAlphaType.Premul);
+                using (var canvas = new SKCanvas(bmp))
+                {
+                    canvas.Clear(SKColors.Transparent);
+                    // Draw a solid color rect in the center (leave 2px transparent margin)
+                    canvas.DrawRect(SKRect.Create(2, 2, w - 4, h - 4), new SKPaint { Color = SKColors.Red });
+                }
+                var p = Path.Combine(tempDir, $"dummy_{i}.png");
+                using var image = SKImage.FromBitmap(bmp);
+                using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+                using var stream = File.Create(p);
+                data.SaveTo(stream);
+                frameFiles.Add(p);
+                bmp.Dispose();
+            }
+
+            var imageProcessor = new ImageProcessingService();
+            var binPacker = new BinPackingService();
+            var exporter = new ExportService();
+            var unpacker = new UnpackService();
+
+            var frames = frameFiles.Select(imageProcessor.LoadFrame).ToList();
+
+            // Pack settings
+            var outDir = Path.Combine(tempDir, "output");
+            var settings = new ExportSettings
+            {
+                PackingMode = PackingMode.BinPack,
+                AlphaTrim = true,
+                Padding = 2,
+                MaxAtlasSize = 1024,
+                ExportPng = true,
+                ExportJson = true,
+                ExportPlist = true,
+                OutputPath = outDir
+            };
+
+            var normalized = imageProcessor.NormalizeFrames(frames, settings.AlphaTrim, settings.Padding);
+            var atlasData = binPacker.Pack(normalized, settings);
+
+            exporter.Export(atlasData, settings, "roundtrip");
+
+            var plistPath = Path.Combine(outDir, "roundtrip.plist");
+            var jsonPath = Path.Combine(outDir, "roundtrip.json");
+            var pngPath = Path.Combine(outDir, "roundtrip.png");
+
+            Assert.True(File.Exists(plistPath));
+            Assert.True(File.Exists(jsonPath));
+            Assert.True(File.Exists(pngPath));
+
+            // Load packed image to simulate UI WriteableBitmap
+            using var fileStream = File.OpenRead(pngPath);
+            using var skiaBitmap = SKBitmap.Decode(fileStream);
+            Assert.NotNull(skiaBitmap);
+
+            var width = skiaBitmap.Width;
+            var height = skiaBitmap.Height;
+            using var bgraBitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            using (var canvas = new SKCanvas(bgraBitmap))
+            {
+                canvas.DrawBitmap(skiaBitmap, 0, 0);
+            }
+            var writeableBitmap = new WriteableBitmap(
+                width,
+                height,
+                96.0,
+                96.0,
+                System.Windows.Media.PixelFormats.Bgra32,
+                null
+            );
+            writeableBitmap.WritePixels(
+                new Int32Rect(0, 0, width, height),
+                bgraBitmap.GetPixels(),
+                bgraBitmap.RowBytes * height,
+                bgraBitmap.RowBytes
+            );
+            writeableBitmap.Freeze();
+
+            // Unpack Plist
+            var plistOutDir = Path.Combine(outDir, "plist_unpacked");
+            var plistSlices = unpacker.ParsePlist(plistPath, writeableBitmap);
+            unpacker.SaveSlices(pngPath, plistSlices, plistOutDir);
+
+            // Unpack JSON
+            var jsonOutDir = Path.Combine(outDir, "json_unpacked");
+            var jsonSlices = unpacker.ParseJson(jsonPath, writeableBitmap);
+            unpacker.SaveSlices(pngPath, jsonSlices, jsonOutDir);
+
+            // Verify size matches original
+            for (var i = 0; i < sizes.Length; i++)
+            {
+                var plistFile = Path.Combine(plistOutDir, $"dummy_{i}.png");
+                var jsonFile = Path.Combine(jsonOutDir, $"dummy_{i}.png");
+
+                Assert.True(File.Exists(plistFile));
+                Assert.True(File.Exists(jsonFile));
+
+                using var pStream = File.OpenRead(plistFile);
+                using var pBmp = SKBitmap.Decode(pStream);
+                Assert.Equal(sizes[i].Item1, pBmp.Width);
+                Assert.Equal(sizes[i].Item2, pBmp.Height);
+
+                using var jStream = File.OpenRead(jsonFile);
+                using var jBmp = SKBitmap.Decode(jStream);
+                Assert.Equal(sizes[i].Item1, jBmp.Width);
+                Assert.Equal(sizes[i].Item2, jBmp.Height);
+            }
+
+            // Dispose frame SKBitmaps
+            foreach (var f in frames)
+            {
+                f.Bitmap.Dispose();
+            }
+            foreach (var f in normalized)
+            {
+                f.Bitmap.Dispose();
+            }
+            atlasData.Atlas.Dispose();
         }
-
-        var files = Directory.GetFiles(sourceDir, "boom_*.png")
-            .OrderBy(f => f, new NaturalSortComparer())
-            .ToList();
-
-        if (files.Count == 0)
+        finally
         {
-            return;
+            try
+            {
+                Directory.Delete(tempDir, true);
+            }
+            catch
+            {
+                // ignore
+            }
         }
-
-        var imageProcessor = new ImageProcessingService();
-        var binPacker = new BinPackingService();
-        var exporter = new ExportService();
-        var unpacker = new UnpackService();
-
-        var frames = files.Select(imageProcessor.LoadFrame).ToList();
-
-        // 1. Pack with AlphaTrim = true, Padding = 2
-        var settings = new ExportSettings
-        {
-            PackingMode = PackingMode.BinPack,
-            AlphaTrim = true,
-            Padding = 2,
-            MaxAtlasSize = 8192,
-            ExportPng = true,
-            ExportJson = true,
-            ExportPlist = true,
-            OutputPath = Path.Combine(Path.GetTempPath(), "AtlasForgeTestOut")
-        };
-
-        var normalized = imageProcessor.NormalizeFrames(frames, settings.AlphaTrim, settings.Padding);
-        var atlasData = binPacker.Pack(normalized, settings);
-
-        // Export
-        var tempDir = settings.OutputPath;
-        if (Directory.Exists(tempDir))
-        {
-            Directory.Delete(tempDir, true);
-        }
-        exporter.Export(atlasData, settings, "roundtrip_test");
-
-        var plistPath = Path.Combine(tempDir, "roundtrip_test.plist");
-        var jsonPath = Path.Combine(tempDir, "roundtrip_test.json");
-        var pngPath = Path.Combine(tempDir, "roundtrip_test.png");
-
-        Assert.True(File.Exists(plistPath));
-        Assert.True(File.Exists(jsonPath));
-        Assert.True(File.Exists(pngPath));
-
-        // Load the packed preview image as 96 DPI
-        using var fileStream = File.OpenRead(pngPath);
-        using var skiaBitmap = SKBitmap.Decode(fileStream);
-        Assert.NotNull(skiaBitmap);
-
-        // Convert to 96 DPI BitmapSource just like the UI does
-        var width = skiaBitmap.Width;
-        var height = skiaBitmap.Height;
-        using var bgraBitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
-        using (var canvas = new SKCanvas(bgraBitmap))
-        {
-            canvas.DrawBitmap(skiaBitmap, 0, 0);
-        }
-        var writeableBitmap = new WriteableBitmap(
-            width,
-            height,
-            96.0,
-            96.0,
-            System.Windows.Media.PixelFormats.Bgra32,
-            null
-        );
-        writeableBitmap.WritePixels(
-            new Int32Rect(0, 0, width, height),
-            bgraBitmap.GetPixels(),
-            bgraBitmap.RowBytes * height,
-            bgraBitmap.RowBytes
-        );
-        writeableBitmap.Freeze();
-
-        // 2. Unpack using Plist
-        var plistOutDir = Path.Combine(tempDir, "plist_unpacked");
-        var plistSlices = unpacker.ParsePlist(plistPath, writeableBitmap);
-        unpacker.SaveSlices(pngPath, plistSlices, plistOutDir);
-
-        // 3. Unpack using JSON
-        var jsonOutDir = Path.Combine(tempDir, "json_unpacked");
-        var jsonSlices = unpacker.ParseJson(jsonPath, writeableBitmap);
-        unpacker.SaveSlices(pngPath, jsonSlices, jsonOutDir);
-
-        // 4. Verify each unpacked file matches the original size
-        foreach (var originalFrame in frames)
-        {
-            var name = Path.GetFileNameWithoutExtension(originalFrame.FilePath);
-            var plistUnpackedFile = Path.Combine(plistOutDir, $"{name}.png");
-            var jsonUnpackedFile = Path.Combine(jsonOutDir, $"{name}.png");
-
-            Assert.True(File.Exists(plistUnpackedFile));
-            Assert.True(File.Exists(jsonUnpackedFile));
-
-            using var origStream = File.OpenRead(originalFrame.FilePath);
-            using var origBmp = SKBitmap.Decode(origStream);
-
-            using var plistStream = File.OpenRead(plistUnpackedFile);
-            using var plistBmp = SKBitmap.Decode(plistStream);
-
-            using var jsonStream = File.OpenRead(jsonUnpackedFile);
-            using var jsonBmp = SKBitmap.Decode(jsonStream);
-
-            Assert.Equal(origBmp.Width, plistBmp.Width);
-            Assert.Equal(origBmp.Height, plistBmp.Height);
-            Assert.Equal(origBmp.Width, jsonBmp.Width);
-            Assert.Equal(origBmp.Height, jsonBmp.Height);
-        }
-
-        // Cleanup
-        Directory.Delete(tempDir, true);
     }
 }

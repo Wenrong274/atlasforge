@@ -21,7 +21,7 @@ public class PreviewService
         }
 
         var frame = atlasData.Frames[frameIndex];
-        var frameBitmap = new SKBitmap(frame.SourceWidth, frame.SourceHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using var frameBitmap = new SKBitmap(frame.SourceWidth, frame.SourceHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
         using var canvas = new SKCanvas(frameBitmap);
         canvas.Clear(SKColors.Transparent);
         canvas.DrawBitmap(
